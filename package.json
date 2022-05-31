@@ -1,0 +1,37 @@
+{
+    "name": "step-security-get-mfa-secrets",
+    "version": "0.0.1",
+    "description": "Get secrets",
+    "main": "index.js",
+    "scripts": {
+        "build": "ncc build src/index.ts --source-map",
+        "lint": "eslint src/**/*.ts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/step-security/get-mfa-secrets.git"
+    },
+    "keywords": [],
+    "author": "Varun Sharma",
+    "license": "Apache License 2.0",
+    "bugs": {
+        "url": "https://github.com/step-security/get-mfa-secrets/issues"
+    },
+    "homepage": "https://github.com/step-security/get-mfa-secrets#readme",
+    "dependencies": {
+        "@actions/http-client": "^1.0.11"
+    },
+    "devDependencies": {
+        "@types/jest": "^27.0.1",
+        "@types/node": "^16.9.0",
+        "@typescript-eslint/eslint-plugin": "^4.29.2",
+        "@typescript-eslint/parser": "^4.29.2",
+        "@vercel/ncc": "^0.30.0",
+        "eslint": "^7.32.0",
+        "eslint-config-google": "^0.14.0",
+        "jest": "^26.6.3",
+        "jest-junit": "^12.2.0",
+        "ts-jest": "^26.5.6",
+        "typescript": "^4.3.5"
+    }
+}

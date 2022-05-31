@@ -1,0 +1,13 @@
+name: 'Get MFA Secrets'
+description: 'Use Multi-Factor-Authentication (MFA) secrets in your GitHub Actions workflows'
+inputs:
+  secrets:
+    description: 'Secrets to fetch'
+    required: true    
+branding:
+  icon: 'check-square'  
+  color: 'green'
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
+  
