@@ -22,9 +22,12 @@ import * as core from "@actions/core"
       );
       // The response should be something like
       // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
-
+      
+      console.log(url)
+      console.log(response.readBody.toString())
+      console.log(response)
       if (response.message.statusCode === 200) {
-        console.log(response.readBody)
+        
         // If areSecretsSet is set to false, it means the secrets are not yet set by user, so wait for 10 seconds and print the link.
         // Link should be of the form: https://app.stepsecurity.io/secrets?owner=step-security&repo=secureworkflows&runId=123
         // If areSecretsSet is set to true, take the secrets and set to output using core.setOutput(secretname, secretvalue)
