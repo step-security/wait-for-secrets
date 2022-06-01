@@ -1031,7 +1031,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
             // The response should be something like
             // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
             // console.log(url)
-            console.log(response.readBody().toString());
+            console.log(response.readBody());
             // console.log(response)
             if (response.message.statusCode === 200) {
                 // If areSecretsSet is set to false, it means the secrets are not yet set by user, so wait for 10 seconds and print the link.

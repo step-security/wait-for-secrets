@@ -24,7 +24,7 @@ import * as core from "@actions/core"
       // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
       
       // console.log(url)
-       console.log(response.readBody().toString())
+       console.log(response.readBody())
       // console.log(response)
       if (response.message.statusCode === 200) {
         
