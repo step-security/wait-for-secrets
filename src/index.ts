@@ -8,11 +8,11 @@ import * as core from "@actions/core"
   var counter = 0;
   while (true) {
 
-    var repo = process.env["GITHUB_REPOSITORY"].split("/")[1]
-    var owner = process.env["GITHUB_REPOSITORY"].split("/")[0]
-    var runId = process.env["GITHUB_RUN_ID"]
+    var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
+    var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
+    var runId = process.env["GITHUB_RUN_ID"];
 
-    var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=" + owner + "&repo=" + repo + "&runId="+ runId+ "&secrets=secret1,secret2"
+    var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=" + owner + "&repo=" + repo + "&runId="+ runId+ "&secrets=secret1,secret2";
 
     try {
       // TODO: Replace owner, repo, runId, and list of secrets in the below API request with actual values
@@ -27,9 +27,23 @@ import * as core from "@actions/core"
       //console.log(response.readBody())
       // console.log(response)
       if (response.message.statusCode === 200) {
-        const body: string = await response.readBody()
-        const obj = JSON.parse(body)
-        console.log(obj)
+        const body: string = await response.readBody();
+        const respJSON = JSON.parse(body);
+        
+        if (respJSON.areSecretsSet === true) {
+          //something
+          respJSON.secrets.forEach( (secret) => {
+            core.setOutput(secret.Name, secret.Value);
+        });
+        break;
+        }
+        else{
+          await sleep(10000);
+
+          console.log("https://app.stepsecurity.io/secrets?owner=" + owner + "&repo=" + repo + "&runId=" + runId)
+
+        }
+
         // If areSecretsSet is set to false, it means the secrets are not yet set by user, so wait for 10 seconds and print the link.
         // Link should be of the form: https://app.stepsecurity.io/secrets?owner=step-security&repo=secureworkflows&runId=123
         // If areSecretsSet is set to true, take the secrets and set to output using core.setOutput(secretname, secretvalue)
