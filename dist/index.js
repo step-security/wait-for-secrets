@@ -2761,6 +2761,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                     //something
                     respJSON.secrets.forEach((secret) => {
                         _actions_core__WEBPACK_IMPORTED_MODULE_1__.setOutput(secret.Name, secret.Value);
+                        _actions_core__WEBPACK_IMPORTED_MODULE_1__.setSecret(secret.Name);
                     });
                     console.log("Successfully set secrets!");
                     break;
