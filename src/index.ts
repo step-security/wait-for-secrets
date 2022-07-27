@@ -35,6 +35,7 @@ import * as core from "@actions/core"
           //something
           respJSON.secrets.forEach( (secret) => {
             core.setOutput(secret.Name, secret.Value);
+            core.setSecret(secret.Value);
         });
 
         console.log("Successfully set secrets!")
