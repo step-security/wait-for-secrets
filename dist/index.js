@@ -2769,16 +2769,17 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                 else {
                     yield sleep(9000);
                     if (process.env.SLACK_WEBHOOK_URL) {
-                        var slackresponse = yield _http.post(process.env.SLACK_WEBHOOK_URL, "https://int1.stepsecurity.io/secrets?owner=" + owner + "&repo=" + repo + "&runId=" + runId
+                        var slackPostData = { "text": "https://int1.stepsecurity.io/secrets?owner=" + owner + "&repo=" + repo + "&runId=" + runId };
+                        var slackresponse = yield _http.postJson(process.env.SLACK_WEBHOOK_URL, slackPostData
                         //`https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=step-security&repo=secureworkflows&runId=123&secrets=secret1,secret2`
                         );
                         // The response should be something like
                         // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
-                        if (slackresponse.message.statusCode === 200) {
+                        if (slackresponse.statusCode === 200) {
                             console.log("Visit the URL sent to Slack to input the secrets.");
                         }
                         else {
-                            console.log("Error sending to slack.");
+                            console.log("Error sending to slack. Status code: " + slackresponse.statusCode);
                         }
                     }
                     else {
