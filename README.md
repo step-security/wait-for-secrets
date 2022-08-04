@@ -1,4 +1,4 @@
-# get-mfa-secrets b2
+# get-mfa-secrets
 [![get-mfa-secrets](images/banner.png)](#)
 Use Multi-Factor-Authentication (MFA) secrets in your GitHub Actions workflows
 
