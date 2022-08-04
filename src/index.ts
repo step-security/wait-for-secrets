@@ -58,8 +58,8 @@ import * as core from "@actions/core"
               // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
               
               if (slackresponse.statusCode === 200) {
-                sendToSlack = false;
                 console.log("Visit the URL sent to Slack to input the secrets.")
+                sendToSlack = false;
               }else{
                 console.log("Error sending to Slack. Status code: " + slackresponse.statusCode)
               }}
