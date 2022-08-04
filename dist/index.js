@@ -2745,12 +2745,14 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
         var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
         var runId = process.env["GITHUB_RUN_ID"];
+        var authIDToken = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
+        var headers = new Headers().append("Authorization", "Bearer " + authIDToken);
         var secretsString = "";
         _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets").forEach((secret) => { secretsString = secretsString + secret + ","; });
         secretsString = secretsString.slice(0, -1);
         var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=" + owner + "&repo=" + repo + "&runId=" + runId + "&secrets=" + secretsString;
         try {
-            var response = yield _http.get(url
+            var response = yield _http.get(url, { headers: { Authorization: 'Bearer ' + authIDToken } }
             //`https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=step-security&repo=secureworkflows&runId=123&secrets=secret1,secret2`
             );
             // The response should be something like
