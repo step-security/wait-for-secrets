@@ -2740,6 +2740,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__/* .HttpClient */ .eN();
     _http.requestOptions = { socketTimeout: 3 * 1000 };
     var counter = 0;
+    var sendToSlack = true;
     while (true) {
         var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
         var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
@@ -2768,7 +2769,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                 }
                 else {
                     yield sleep(9000);
-                    if (process.env.SLACK_WEBHOOK_URL) {
+                    if (process.env.SLACK_WEBHOOK_URL && sendToSlack) {
                         var slackPostData = { "text": "https://int1.stepsecurity.io/secrets?owner=" + owner + "&repo=" + repo + "&runId=" + runId };
                         var slackresponse = yield _http.postJson(process.env.SLACK_WEBHOOK_URL, slackPostData
                         //`https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=step-security&repo=secureworkflows&runId=123&secrets=secret1,secret2`
@@ -2776,10 +2777,11 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                         // The response should be something like
                         // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
                         if (slackresponse.statusCode === 200) {
+                            sendToSlack = false;
                             console.log("Visit the URL sent to Slack to input the secrets.");
                         }
                         else {
-                            console.log("Error sending to slack. Status code: " + slackresponse.statusCode);
+                            console.log("Error sending to Slack. Status code: " + slackresponse.statusCode);
                         }
                     }
                     else {
