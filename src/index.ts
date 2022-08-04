@@ -45,23 +45,24 @@ import * as core from "@actions/core"
         else{
           await sleep(9000);
 
-          if(process.env.SLACK_WEBHOOK_URL && sendToSlack){
+          if(process.env.SLACK_WEBHOOK_URL){
             
-            var slackPostData = {"text":"https://int1.stepsecurity.io/secrets?owner=" + owner + "&repo=" + repo + "&runId=" + runId}
-            
-            var slackresponse = await _http.postJson(
-              process.env.SLACK_WEBHOOK_URL, slackPostData
-              //`https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=step-security&repo=secureworkflows&runId=123&secrets=secret1,secret2`
-            );
-            // The response should be something like
-            // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
-            
-            if (slackresponse.statusCode === 200) {
-              sendToSlack = false;
-              console.log("Visit the URL sent to Slack to input the secrets.")
-            }else{
-              console.log("Error sending to Slack. Status code: " + slackresponse.statusCode)
-            }
+            if(sendToSlack){
+              var slackPostData = {"text":"https://int1.stepsecurity.io/secrets?owner=" + owner + "&repo=" + repo + "&runId=" + runId}
+              
+              var slackresponse = await _http.postJson(
+                process.env.SLACK_WEBHOOK_URL, slackPostData
+                //`https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=step-security&repo=secureworkflows&runId=123&secrets=secret1,secret2`
+              );
+              // The response should be something like
+              // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
+              
+              if (slackresponse.statusCode === 200) {
+                sendToSlack = false;
+                console.log("Visit the URL sent to Slack to input the secrets.")
+              }else{
+                console.log("Error sending to Slack. Status code: " + slackresponse.statusCode)
+              }}
           }else{
             console.log("Visit the URL to input the secrets:")
           
