@@ -12,6 +12,9 @@ import * as core from "@actions/core"
     var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
     var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
     var runId = process.env["GITHUB_RUN_ID"];
+    var authIDToken = core.getIDToken()
+
+    var headers = new Headers().append("Authorization", "Bearer " + authIDToken)
 
     var secretsString = ""
 
@@ -23,7 +26,7 @@ import * as core from "@actions/core"
 
     try {
       var response = await _http.get(
-        url
+        url, {headers: {Authorization: 'Bearer ' + authIDToken}}
         //`https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=step-security&repo=secureworkflows&runId=123&secrets=secret1,secret2`
       );
       // The response should be something like
