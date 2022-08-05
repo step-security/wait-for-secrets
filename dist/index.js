@@ -2753,9 +2753,9 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?secrets=" +
             secretsString;
         try {
-            var response = yield _http.get(url, { headers: { Authorization: "Bearer " + authIDToken } }
-            //`https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?owner=step-security&repo=secureworkflows&runId=123&secrets=secret1,secret2`
-            );
+            const additionalHeaders = { Authorization: "Bearer " + authIDToken };
+            //`https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets?secrets=secret1,secret2`
+            var response = yield _http.get(url, additionalHeaders);
             // The response should be something like
             // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
             if (response.message.statusCode === 200) {
