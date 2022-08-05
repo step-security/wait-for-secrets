@@ -6,11 +6,11 @@ import * as core from "@actions/core";
   let _http = new httpm.HttpClient();
   _http.requestOptions = { socketTimeout: 3 * 1000 };
   var counter = 0;
+  var authIDToken = await core.getIDToken();
   while (true) {
     var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
     var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
     var runId = process.env["GITHUB_RUN_ID"];
-    var authIDToken = await core.getIDToken();
 
     var secretsString = "";
 
