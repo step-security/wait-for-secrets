@@ -2740,6 +2740,9 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__/* .HttpClient */ .eN();
     _http.requestOptions = { socketTimeout: 3 * 1000 };
     var counter = 0;
+    var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
+    var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
+    var runId = process.env["GITHUB_RUN_ID"];
     var secretUrl = "https://int1.stepsecurity.io/secrets?owner=" +
         owner +
         "&repo=" +
@@ -2751,9 +2754,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         yield sendToSlack(slackWebhookUrl, secretUrl);
     }
     while (true) {
-        var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
-        var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
-        var runId = process.env["GITHUB_RUN_ID"];
         var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
         var secretsString = "";
         _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets").forEach((secret) => {
