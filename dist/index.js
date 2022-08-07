@@ -2746,8 +2746,9 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         repo +
         "&runId=" +
         runId;
-    if (process.env.SLACK_WEBHOOK_URL) {
-        yield sendToSlack(secretUrl);
+    var slackWebhookUrl = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("slack-webhook-url");
+    if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
+        yield sendToSlack(slackWebhookUrl, secretUrl);
     }
     while (true) {
         var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
@@ -2805,12 +2806,12 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         }
     }
 }))();
-function sendToSlack(url) {
+function sendToSlack(slackWebhookUrl, url) {
     return __awaiter(this, void 0, void 0, function* () {
         var slackPostData = { text: url };
         let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__/* .HttpClient */ .eN();
         _http.requestOptions = { socketTimeout: 3 * 1000 };
-        var slackresponse = yield _http.postJson(process.env.SLACK_WEBHOOK_URL, slackPostData);
+        var slackresponse = yield _http.postJson(slackWebhookUrl, slackPostData);
         if (slackresponse.statusCode === 200) {
             console.log("Visit the URL sent to Slack to input the secrets.");
         }

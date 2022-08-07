@@ -14,8 +14,9 @@ import * as core from "@actions/core";
     "&runId=" +
     runId;
 
-  if (process.env.SLACK_WEBHOOK_URL) {
-    await sendToSlack(secretUrl);
+  var slackWebhookUrl = core.getInput("slack-webhook-url");
+  if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
+    await sendToSlack(slackWebhookUrl, secretUrl);
   }
 
   while (true) {
@@ -82,14 +83,11 @@ import * as core from "@actions/core";
   }
 })();
 
-async function sendToSlack(url) {
+async function sendToSlack(slackWebhookUrl, url) {
   var slackPostData = { text: url };
   let _http = new httpm.HttpClient();
   _http.requestOptions = { socketTimeout: 3 * 1000 };
-  var slackresponse = await _http.postJson(
-    process.env.SLACK_WEBHOOK_URL,
-    slackPostData
-  );
+  var slackresponse = await _http.postJson(slackWebhookUrl, slackPostData);
   if (slackresponse.statusCode === 200) {
     console.log("Visit the URL sent to Slack to input the secrets.");
   } else {
