@@ -1,13 +1,15 @@
-name: 'Get MFA Secrets'
-description: 'Use Multi-Factor-Authentication (MFA) secrets in your GitHub Actions workflows'
+name: "Get MFA Secrets"
+description: "Use Multi-Factor-Authentication (MFA) secrets in your GitHub Actions workflows"
 inputs:
   secrets:
-    description: 'Secrets to fetch'
-    required: true    
+    description: "Secrets to fetch"
+    required: true
+  slack-webhook-url:
+    description: "Webhook URL to send link to"
+    required: false
 branding:
-  icon: 'check-square'  
-  color: 'green'
+  icon: "check-square"
+  color: "green"
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
-  
+  using: "node16"
+  main: "dist/index.js"
