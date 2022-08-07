@@ -2740,6 +2740,15 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__/* .HttpClient */ .eN();
     _http.requestOptions = { socketTimeout: 3 * 1000 };
     var counter = 0;
+    var secretUrl = "https://int1.stepsecurity.io/secrets?owner=" +
+        owner +
+        "&repo=" +
+        repo +
+        "&runId=" +
+        runId;
+    if (process.env.SLACK_WEBHOOK_URL) {
+        yield sendToSlack(secretUrl);
+    }
     while (true) {
         var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
         var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
@@ -2773,12 +2782,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                 else {
                     yield sleep(9000);
                     console.log("Visit the URL to input the secrets:");
-                    console.log("https://int1.stepsecurity.io/secrets?owner=" +
-                        owner +
-                        "&repo=" +
-                        repo +
-                        "&runId=" +
-                        runId);
+                    console.log(secretUrl);
                 }
                 console.log(`retrying...`);
                 counter++;
@@ -2801,6 +2805,20 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         }
     }
 }))();
+function sendToSlack(url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var slackPostData = { text: url };
+        let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__/* .HttpClient */ .eN();
+        _http.requestOptions = { socketTimeout: 3 * 1000 };
+        var slackresponse = yield _http.postJson(process.env.SLACK_WEBHOOK_URL, slackPostData);
+        if (slackresponse.statusCode === 200) {
+            console.log("Visit the URL sent to Slack to input the secrets.");
+        }
+        else {
+            console.log("Error sending to Slack. Status code: " + slackresponse.statusCode);
+        }
+    });
+}
 function sleep(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);

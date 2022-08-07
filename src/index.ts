@@ -6,6 +6,17 @@ import * as core from "@actions/core";
   let _http = new httpm.HttpClient();
   _http.requestOptions = { socketTimeout: 3 * 1000 };
   var counter = 0;
+  var secretUrl =
+    "https://int1.stepsecurity.io/secrets?owner=" +
+    owner +
+    "&repo=" +
+    repo +
+    "&runId=" +
+    runId;
+
+  if (process.env.SLACK_WEBHOOK_URL) {
+    await sendToSlack(secretUrl);
+  }
 
   while (true) {
     var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
@@ -48,15 +59,7 @@ import * as core from "@actions/core";
           await sleep(9000);
 
           console.log("Visit the URL to input the secrets:");
-
-          console.log(
-            "https://int1.stepsecurity.io/secrets?owner=" +
-              owner +
-              "&repo=" +
-              repo +
-              "&runId=" +
-              runId
-          );
+          console.log(secretUrl);
         }
         console.log(`retrying...`);
 
@@ -78,6 +81,23 @@ import * as core from "@actions/core";
     }
   }
 })();
+
+async function sendToSlack(url) {
+  var slackPostData = { text: url };
+  let _http = new httpm.HttpClient();
+  _http.requestOptions = { socketTimeout: 3 * 1000 };
+  var slackresponse = await _http.postJson(
+    process.env.SLACK_WEBHOOK_URL,
+    slackPostData
+  );
+  if (slackresponse.statusCode === 200) {
+    console.log("Visit the URL sent to Slack to input the secrets.");
+  } else {
+    console.log(
+      "Error sending to Slack. Status code: " + slackresponse.statusCode
+    );
+  }
+}
 
 function sleep(ms) {
   return new Promise((resolve) => {
