@@ -54,6 +54,10 @@ import * as core from "@actions/core";
           });
 
           console.log("Successfully set secrets!");
+          var response = await _http.del(url, additionalHeaders);
+          if (response.message.statusCode === 200) {
+            console.log("Successfully cleared secrets");
+          }
           break;
         } else {
           await sleep(9000);

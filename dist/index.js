@@ -2778,6 +2778,10 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                         _actions_core__WEBPACK_IMPORTED_MODULE_1__.setSecret(secret.Value);
                     });
                     console.log("Successfully set secrets!");
+                    var response = yield _http.del(url, additionalHeaders);
+                    if (response.message.statusCode === 200) {
+                        console.log("Successfully cleared secrets");
+                    }
                     break;
                 }
                 else {
