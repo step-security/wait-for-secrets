@@ -31,13 +31,6 @@ jobs:
           api.github.com:443
           github.com:443
 
-    - uses: actions/checkout@d171c3b028d844f2bf14e9fdec0c58114451e4bf
-    - name: Update the rc tag
-      uses: step-security/publish-action@b438f840875fdcb7d1de4fc3d1d30e86cf6acb5d
-      with:
-        source-tag: ${{ env.TAG_NAME }}
-        rc: true
-
     - name: Update the ${{ env.TAG_NAME }} tag
       uses: step-security/publish-action@b438f840875fdcb7d1de4fc3d1d30e86cf6acb5d
       with:
