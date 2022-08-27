@@ -30,6 +30,7 @@ jobs:
         allowed-endpoints: 
           api.github.com:443
           github.com:443
+          prod.api.stepsecurity.io:443
 
     - uses: step-security/wait-for-secrets@v1
       id: wait-for-secrets
