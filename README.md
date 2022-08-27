@@ -1,15 +1,73 @@
-# get-mfa-secrets
-[![get-mfa-secrets](images/banner.png)](#)
-Use Multi-Factor-Authentication (MFA) secrets in your GitHub Actions workflows
+# wait-for-secrets
 
-> :warning: This GitHub Action is not ready for Production use. 
+GitHub Action that waits for secrets to be entered during a workflow run. The secrets can be entered using a web browser.
 
 ## Why?
-Lot of software is published using Continous Deployment (CD) Pipelines. Publishing secrets are typically stored with the CI/ CD provider. This makes it hard to use Multi-Factor-Authentication (MFA) to publish software. 
+- To enable using one-time password (OTPs) for a release workflow.
+- To remove need to persist secrets in GitHub Secrets. 
+- You have more control over when secrets get used in your workflows.
+- Even if someone has write access to the repository, they do not get access to the secrets
 
-As an example, NPM allows use of OTP (one-time password) for publishing NPM package, but the OTP is only valid for a minute or so. This makes it hard to use it in the CD pipeline. 
+## How?
 
-This GitHub Action allows use of MFA and OTPs during the CD pipeline
+1. Add the `wait-for-secrets` GitHub Action to your workflow and specify the secrets you need. 
+2. The Action will print a URL in the build log every 10 seconds. 
+3. Click on the URL and enter the secrets that the workflow needs.
+4. The Action will get the secrets you entered in the browser and continue execution. 
+5. Use the retreived secrets in future steps. 
 
-## How does it work?
-It waits for input when the credential is needed and prints out a website URL in the logs. You can click the link and enter the input in the StepSecurity website. The secret is then sent over to the GitHub Action, where it can be used. 
+### AWS Secrets
+
+Example on how to provide AWS credentials during the workflow. 
+
+It needs the `id-token: write` permission to authenticate to the StepSecurity API. This is to ensure only the authorized workflow can retreive the secrets. 
+
+``` yaml
+jobs:
+  release:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/wait-for-secrets@v1
+        id: wait-for-secrets
+        with:
+          secrets: |
+            AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ steps.wait-for-secrets.outputs.AWS_ACCESS_KEY_ID }}  
+          aws-secret-access-key: ${{ steps.wait-for-secrets.outputs.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+```
+
+### Slack notification
+
+You can get a notification on Slack when the secret needs to be entered. Set the `slack-webhook-url` as shown below. 
+This example also shows how to publish to NPM registry using an OTP. 
+
+``` yaml
+jobs:
+  release:
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/wait-for-secrets@v1
+        id: wait-for-secrets
+        with:
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          secrets: |
+            otp
+            npm_token
+      - run: | 
+          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > .npmrc
+          npm publish --otp ${{ steps.wait-for-secrets.outputs.otp }}
+        env:
+          NODE_AUTH_TOKEN: ${{ steps.wait-for-secrets.outputs.npm_token }}     
+```
