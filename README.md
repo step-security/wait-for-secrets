@@ -76,4 +76,4 @@ jobs:
 
 Here are a couple of workflows that use `wait-for-secrets`
 1. https://github.com/step-security/secure-workflows/blob/main/.github/workflows/release.yml#L36-L49
-2. https://github.com/step-security/wait-for-secrets/blob/varunsh-coder-patch-1/.github/workflows/release.yml#L35-L44
+2. https://github.com/step-security/wait-for-secrets/blob/main/.github/workflows/release.yml#L35-L44
