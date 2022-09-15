@@ -2753,14 +2753,14 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
         yield sendToSlack(slackWebhookUrl, secretUrl);
     }
+    var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
+    var secretsString = "";
+    _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets").forEach((secret) => {
+        secretsString = secretsString + secret + ",";
+    });
+    secretsString = secretsString.slice(0, -1);
+    var url = "https://prod.api.stepsecurity.io/v1/secrets?secrets=" + secretsString;
     while (true) {
-        var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
-        var secretsString = "";
-        _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets").forEach((secret) => {
-            secretsString = secretsString + secret + ",";
-        });
-        secretsString = secretsString.slice(0, -1);
-        var url = "https://prod.api.stepsecurity.io/v1/secrets?secrets=" + secretsString;
         try {
             const additionalHeaders = { Authorization: "Bearer " + authIDToken };
             var response = yield _http.get(url, additionalHeaders);
@@ -2775,7 +2775,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                         _actions_core__WEBPACK_IMPORTED_MODULE_1__.setOutput(secret.Name, secret.Value);
                         _actions_core__WEBPACK_IMPORTED_MODULE_1__.setSecret(secret.Value);
                     });
-                    console.log("Successfully set secrets!");
+                    console.log("\n\nSuccessfully set secrets!");
                     var response = yield _http.del(url, additionalHeaders);
                     if (response.message.statusCode === 200) {
                         console.log("Successfully cleared secrets");
@@ -2783,22 +2783,25 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                     break;
                 }
                 else {
+                    if (counter == 0) {
+                        console.log("\x1b[32m%s\x1b[0m", "Visit the URL to input the secrets:");
+                        console.log(secretUrl);
+                        console.log("waiting....");
+                    }
                     yield sleep(9000);
-                    console.log("Visit the URL to input the secrets:");
-                    console.log(secretUrl);
+                    process.stdout.write(".");
                 }
-                console.log(`retrying...`);
                 counter++;
                 if (counter > 60) {
-                    console.log("timed out");
+                    console.log("\ntimed out");
                     break;
                 }
                 yield sleep(1000);
             }
             else {
                 let body = yield response.readBody();
-                console.log(`response: ${body}`);
                 if (body !== "Token used before issued") {
+                    console.log(`\n\nresponse: ${body}`);
                     break;
                 }
             }

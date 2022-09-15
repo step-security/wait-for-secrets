@@ -22,19 +22,19 @@ import * as core from "@actions/core";
     await sendToSlack(slackWebhookUrl, secretUrl);
   }
 
+  var authIDToken = await core.getIDToken();
+  var secretsString = "";
+
+  core.getMultilineInput("secrets").forEach((secret) => {
+    secretsString = secretsString + secret + ",";
+  });
+
+  secretsString = secretsString.slice(0, -1);
+
+  var url =
+    "https://prod.api.stepsecurity.io/v1/secrets?secrets=" + secretsString;
+
   while (true) {
-    var authIDToken = await core.getIDToken();
-    var secretsString = "";
-
-    core.getMultilineInput("secrets").forEach((secret) => {
-      secretsString = secretsString + secret + ",";
-    });
-
-    secretsString = secretsString.slice(0, -1);
-
-    var url =
-      "https://prod.api.stepsecurity.io/v1/secrets?secrets=" + secretsString;
-
     try {
       const additionalHeaders = { Authorization: "Bearer " + authIDToken };
 
@@ -52,30 +52,33 @@ import * as core from "@actions/core";
             core.setSecret(secret.Value);
           });
 
-          console.log("Successfully set secrets!");
+          console.log("\n\nSuccessfully set secrets!");
           var response = await _http.del(url, additionalHeaders);
           if (response.message.statusCode === 200) {
             console.log("Successfully cleared secrets");
           }
           break;
         } else {
-          await sleep(9000);
+          if(counter == 0){
+              console.log("\x1b[32m%s\x1b[0m","Visit the URL to input the secrets:");
+              console.log(secretUrl);
+              console.log("waiting....");
+          }
 
-          console.log("Visit the URL to input the secrets:");
-          console.log(secretUrl);
+          await sleep(9000);
+          process.stdout.write(".");
         }
-        console.log(`retrying...`);
 
         counter++;
         if (counter > 60) {
-          console.log("timed out");
+          console.log("\ntimed out");
           break;
         }
         await sleep(1000);
       } else {
         let body: string = await response.readBody();
-        console.log(`response: ${body}`);
         if (body !== "Token used before issued") {
+          console.log(`\n\nresponse: ${body}`);
           break;
         }
       }
