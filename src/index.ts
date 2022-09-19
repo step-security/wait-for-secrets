@@ -59,14 +59,10 @@ import * as core from "@actions/core";
           }
           break;
         } else {
-          if(counter == 0){
-              console.log("\x1b[32m%s\x1b[0m","Visit the URL to input the secrets:");
-              console.log(secretUrl);
-              console.log("waiting....");
-          }
-
+          console.log("\x1b[32m%s\x1b[0m","\nVisit this URL to input secrets:");
+          console.log(secretUrl);
+        
           await sleep(9000);
-          process.stdout.write(".");
         }
 
         counter++;
