@@ -52,7 +52,7 @@ import * as core from "@actions/core";
             core.setSecret(secret.Value);
           });
 
-          console.log("\n\nSuccessfully set secrets!");
+          console.log("\nSuccessfully set secrets!");
           var response = await _http.del(url, additionalHeaders);
           if (response.message.statusCode === 200) {
             console.log("Successfully cleared secrets");
@@ -61,7 +61,6 @@ import * as core from "@actions/core";
         } else {
           console.log("\x1b[32m%s\x1b[0m","Visit this URL to input secrets:");
           console.log(secretUrl);
-          console.log("\n")
         
           await sleep(9000);
         }
@@ -75,7 +74,7 @@ import * as core from "@actions/core";
       } else {
         let body: string = await response.readBody();
         if (body !== "Token used before issued") {
-          console.log(`\n\nresponse: ${body}`);
+          console.log(`\nresponse: ${body}`);
           break;
         }
       }
