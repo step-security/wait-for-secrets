@@ -2783,8 +2783,9 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                     break;
                 }
                 else {
-                    console.log("\x1b[32m%s\x1b[0m", "\nVisit this URL to input secrets:");
+                    console.log("\x1b[32m%s\x1b[0m", "Visit this URL to input secrets:");
                     console.log(secretUrl);
+                    console.log("\n");
                     yield sleep(9000);
                 }
                 counter++;

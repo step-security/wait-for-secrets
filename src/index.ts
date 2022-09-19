@@ -59,8 +59,9 @@ import * as core from "@actions/core";
           }
           break;
         } else {
-          console.log("\x1b[32m%s\x1b[0m","\nVisit this URL to input secrets:");
+          console.log("\x1b[32m%s\x1b[0m","Visit this URL to input secrets:");
           console.log(secretUrl);
+          console.log("\n")
         
           await sleep(9000);
         }
