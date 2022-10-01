@@ -70,7 +70,7 @@ interface HttpBinData {
         } else {
           console.log(
             "\x1b[32m%s\x1b[0m",
-            "Visit this URL to input secrets: %s",
+            "Visit this URL to input secrets: ",
             secretUrl
           );
 
