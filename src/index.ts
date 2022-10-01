@@ -36,22 +36,28 @@ interface HttpBinData {
   console.log(JSON.stringify(secretsString));
 
   var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets";
+  const additionalHeaders = { Authorization: "Bearer " + authIDToken };
+
+  var putResponse = await _http.putJson<HttpBinData>(
+    url,
+    secretsString,
+    additionalHeaders
+  );
+  if (putResponse.statusCode !== 200) {
+    console.log(`error in sending secret metadata`);
+    return;
+  }
 
   while (true) {
     try {
-      const additionalHeaders = { Authorization: "Bearer " + authIDToken };
-
-      var putResponse = await _http.putJson<HttpBinData>(
-        url,
-        secretsString,
-        additionalHeaders
-      );
+      var response = await _http.get(url, additionalHeaders);
       // The response should be something like
       // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
-      if (putResponse.statusCode === 200) {
-        //const body: string = putResponse.result?.json;
-        const respJSON = putResponse.result?.json;
+      if (response.message.statusCode === 200) {
+        const body: string = await response.readBody();
+        const respJSON = JSON.parse(body);
 
+        console.log(JSON.stringify(respJSON));
         if (respJSON.areSecretsSet === true) {
           //something
           respJSON.secrets.forEach((secret) => {
@@ -79,9 +85,9 @@ interface HttpBinData {
         }
         await sleep(1000);
       } else {
-        const respJSON = putResponse.result?.json;
-        if (JSON.stringify(respJSON) !== "Token used before issued") {
-          console.log(`\nresponse: ${JSON.stringify(respJSON)}`);
+        let body: string = await response.readBody();
+        if (body !== "Token used before issued") {
+          console.log(`\nresponse: ${body}`);
           break;
         }
       }
