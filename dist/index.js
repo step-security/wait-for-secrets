@@ -2766,14 +2766,10 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     while (true) {
         try {
             var response = yield _http.get(url, additionalHeaders);
-            // The response should be something like
-            // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
             if (response.message.statusCode === 200) {
                 const body = yield response.readBody();
                 const respJSON = JSON.parse(body);
-                console.log(JSON.stringify(respJSON));
                 if (respJSON.areSecretsSet === true) {
-                    //something
                     respJSON.secrets.forEach((secret) => {
                         _actions_core__WEBPACK_IMPORTED_MODULE_1__.setOutput(secret.Name, secret.Value);
                         _actions_core__WEBPACK_IMPORTED_MODULE_1__.setSecret(secret.Value);

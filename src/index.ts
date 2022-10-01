@@ -51,15 +51,11 @@ interface HttpBinData {
   while (true) {
     try {
       var response = await _http.get(url, additionalHeaders);
-      // The response should be something like
-      // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
       if (response.message.statusCode === 200) {
         const body: string = await response.readBody();
         const respJSON = JSON.parse(body);
 
-        console.log(JSON.stringify(respJSON));
         if (respJSON.areSecretsSet === true) {
-          //something
           respJSON.secrets.forEach((secret) => {
             core.setOutput(secret.Name, secret.Value);
             core.setSecret(secret.Value);
