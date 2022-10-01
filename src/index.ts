@@ -18,7 +18,7 @@ interface HttpBinData {
   var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
   var runId = process.env["GITHUB_RUN_ID"];
   var secretUrl =
-    "https://int1.stepsecurity.io/secrets?owner=" +
+    "https://app.stepsecurity.io/secrets?owner=" +
     owner +
     "&repo=" +
     repo +
@@ -35,7 +35,7 @@ interface HttpBinData {
   var secretsString = core.getMultilineInput("secrets");
   console.log(JSON.stringify(secretsString));
 
-  var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets";
+  var url = "https://prod.api.stepsecurity.io/v1/secrets";
   const additionalHeaders = { Authorization: "Bearer " + authIDToken };
 
   var putResponse = await _http.putJson<HttpBinData>(

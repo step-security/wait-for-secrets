@@ -2743,7 +2743,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
     var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
     var runId = process.env["GITHUB_RUN_ID"];
-    var secretUrl = "https://int1.stepsecurity.io/secrets?owner=" +
+    var secretUrl = "https://app.stepsecurity.io/secrets?owner=" +
         owner +
         "&repo=" +
         repo +
@@ -2756,7 +2756,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
     var secretsString = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets");
     console.log(JSON.stringify(secretsString));
-    var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets";
+    var url = "https://prod.api.stepsecurity.io/v1/secrets";
     const additionalHeaders = { Authorization: "Bearer " + authIDToken };
     var putResponse = yield _http.putJson(url, secretsString, additionalHeaders);
     if (putResponse.statusCode !== 200) {
