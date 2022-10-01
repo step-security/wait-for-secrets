@@ -2755,11 +2755,12 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     }
     var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
     var secretsString = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets");
+    console.log(JSON.stringify(secretsString));
     var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets";
     while (true) {
         try {
             const additionalHeaders = { Authorization: "Bearer " + authIDToken };
-            var response = yield _http.post(url, JSON.stringify(secretsString), additionalHeaders);
+            var response = yield _http.put(url, JSON.stringify(secretsString), additionalHeaders);
             // The response should be something like
             // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
             if (response.message.statusCode === 200) {

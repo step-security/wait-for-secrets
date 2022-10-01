@@ -23,7 +23,9 @@ import * as core from "@actions/core";
   }
 
   var authIDToken = await core.getIDToken();
+
   var secretsString = core.getMultilineInput("secrets");
+  console.log(JSON.stringify(secretsString));
 
   var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets";
 
@@ -31,7 +33,7 @@ import * as core from "@actions/core";
     try {
       const additionalHeaders = { Authorization: "Bearer " + authIDToken };
 
-      var response = await _http.post(
+      var response = await _http.put(
         url,
         JSON.stringify(secretsString),
         additionalHeaders
