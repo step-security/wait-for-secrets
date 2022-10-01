@@ -1,6 +1,14 @@
 import * as httpm from "@actions/http-client";
 import * as core from "@actions/core";
 
+interface HttpBinData {
+  url: string;
+  data: any;
+  json: any;
+  headers: any;
+  args?: any;
+}
+
 (async () => {
   // call API
   let _http = new httpm.HttpClient();
@@ -33,16 +41,16 @@ import * as core from "@actions/core";
     try {
       const additionalHeaders = { Authorization: "Bearer " + authIDToken };
 
-      var response = await _http.put(
+      var putResponse = await _http.putJson<HttpBinData>(
         url,
-        JSON.stringify(secretsString),
+        secretsString,
         additionalHeaders
       );
       // The response should be something like
       // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
-      if (response.message.statusCode === 200) {
-        const body: string = await response.readBody();
-        const respJSON = JSON.parse(body);
+      if (putResponse.statusCode === 200) {
+        //const body: string = putResponse.result?.json;
+        const respJSON = putResponse.result?.json;
 
         if (respJSON.areSecretsSet === true) {
           //something
@@ -71,9 +79,9 @@ import * as core from "@actions/core";
         }
         await sleep(1000);
       } else {
-        let body: string = await response.readBody();
-        if (body !== "Token used before issued") {
-          console.log(`\nresponse: ${body}`);
+        const respJSON = putResponse.result?.json;
+        if (JSON.stringify(respJSON) !== "Token used before issued") {
+          console.log(`\nresponse: ${JSON.stringify(respJSON)}`);
           break;
         }
       }

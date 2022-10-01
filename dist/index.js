@@ -2736,6 +2736,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 (() => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
     // call API
     let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__/* .HttpClient */ .eN();
     _http.requestOptions = { socketTimeout: 3 * 1000 };
@@ -2760,12 +2761,12 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     while (true) {
         try {
             const additionalHeaders = { Authorization: "Bearer " + authIDToken };
-            var response = yield _http.put(url, JSON.stringify(secretsString), additionalHeaders);
+            var putResponse = yield _http.putJson(url, secretsString, additionalHeaders);
             // The response should be something like
             // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
-            if (response.message.statusCode === 200) {
-                const body = yield response.readBody();
-                const respJSON = JSON.parse(body);
+            if (putResponse.statusCode === 200) {
+                //const body: string = putResponse.result?.json;
+                const respJSON = (_a = putResponse.result) === null || _a === void 0 ? void 0 : _a.json;
                 if (respJSON.areSecretsSet === true) {
                     //something
                     respJSON.secrets.forEach((secret) => {
@@ -2792,9 +2793,9 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
                 yield sleep(1000);
             }
             else {
-                let body = yield response.readBody();
-                if (body !== "Token used before issued") {
-                    console.log(`\nresponse: ${body}`);
+                const respJSON = (_b = putResponse.result) === null || _b === void 0 ? void 0 : _b.json;
+                if (JSON.stringify(respJSON) !== "Token used before issued") {
+                    console.log(`\nresponse: ${JSON.stringify(respJSON)}`);
                     break;
                 }
             }
