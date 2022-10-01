@@ -10,7 +10,7 @@ import * as core from "@actions/core";
   var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
   var runId = process.env["GITHUB_RUN_ID"];
   var secretUrl =
-    "https://app.stepsecurity.io/secrets?owner=" +
+    "https://int1.stepsecurity.io/secrets?owner=" +
     owner +
     "&repo=" +
     repo +
@@ -23,22 +23,19 @@ import * as core from "@actions/core";
   }
 
   var authIDToken = await core.getIDToken();
-  var secretsString = "";
+  var secretsString = core.getMultilineInput("secrets");
 
-  core.getMultilineInput("secrets").forEach((secret) => {
-    secretsString = secretsString + secret + ",";
-  });
-
-  secretsString = secretsString.slice(0, -1);
-
-  var url =
-    "https://prod.api.stepsecurity.io/v1/secrets?secrets=" + secretsString;
+  var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets";
 
   while (true) {
     try {
       const additionalHeaders = { Authorization: "Bearer " + authIDToken };
 
-      var response = await _http.get(url, additionalHeaders);
+      var response = await _http.post(
+        url,
+        JSON.stringify(secretsString),
+        additionalHeaders
+      );
       // The response should be something like
       // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
       if (response.message.statusCode === 200) {
@@ -59,9 +56,9 @@ import * as core from "@actions/core";
           }
           break;
         } else {
-          console.log("\x1b[32m%s\x1b[0m","Visit this URL to input secrets:");
+          console.log("\x1b[32m%s\x1b[0m", "Visit this URL to input secrets:");
           console.log(secretUrl);
-        
+
           await sleep(9000);
         }
 

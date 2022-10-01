@@ -2743,7 +2743,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
     var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
     var runId = process.env["GITHUB_RUN_ID"];
-    var secretUrl = "https://app.stepsecurity.io/secrets?owner=" +
+    var secretUrl = "https://int1.stepsecurity.io/secrets?owner=" +
         owner +
         "&repo=" +
         repo +
@@ -2754,16 +2754,12 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
         yield sendToSlack(slackWebhookUrl, secretUrl);
     }
     var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
-    var secretsString = "";
-    _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets").forEach((secret) => {
-        secretsString = secretsString + secret + ",";
-    });
-    secretsString = secretsString.slice(0, -1);
-    var url = "https://prod.api.stepsecurity.io/v1/secrets?secrets=" + secretsString;
+    var secretsString = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets");
+    var url = "https://9046hrh9g0.execute-api.us-west-2.amazonaws.com/v1/secrets";
     while (true) {
         try {
             const additionalHeaders = { Authorization: "Bearer " + authIDToken };
-            var response = yield _http.get(url, additionalHeaders);
+            var response = yield _http.post(url, JSON.stringify(secretsString), additionalHeaders);
             // The response should be something like
             // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
             if (response.message.statusCode === 200) {
