@@ -1,6 +1,14 @@
 import * as httpm from "@actions/http-client";
 import * as core from "@actions/core";
 
+interface HttpBinData {
+  url: string;
+  data: any;
+  json: any;
+  headers: any;
+  args?: any;
+}
+
 (async () => {
   // call API
   let _http = new httpm.HttpClient();
@@ -23,30 +31,31 @@ import * as core from "@actions/core";
   }
 
   var authIDToken = await core.getIDToken();
-  var secretsString = "";
 
-  core.getMultilineInput("secrets").forEach((secret) => {
-    secretsString = secretsString + secret + ",";
-  });
+  var secretsString = core.getMultilineInput("secrets");
+  console.log(JSON.stringify(secretsString));
 
-  secretsString = secretsString.slice(0, -1);
+  var url = "https://prod.api.stepsecurity.io/v1/secrets";
+  const additionalHeaders = { Authorization: "Bearer " + authIDToken };
 
-  var url =
-    "https://prod.api.stepsecurity.io/v1/secrets?secrets=" + secretsString;
+  var putResponse = await _http.putJson<HttpBinData>(
+    url,
+    secretsString,
+    additionalHeaders
+  );
+  if (putResponse.statusCode !== 200) {
+    console.log(`error in sending secret metadata`);
+    return;
+  }
 
   while (true) {
     try {
-      const additionalHeaders = { Authorization: "Bearer " + authIDToken };
-
       var response = await _http.get(url, additionalHeaders);
-      // The response should be something like
-      // {"repo":"step-security/secureworkflows","runId":"123","areSecretsSet":true,"secrets":[{"Name":"secret1","Value":"val1"},{"Name":"secret2","Value":"valueofsecret2"}]}
       if (response.message.statusCode === 200) {
         const body: string = await response.readBody();
         const respJSON = JSON.parse(body);
 
         if (respJSON.areSecretsSet === true) {
-          //something
           respJSON.secrets.forEach((secret) => {
             core.setOutput(secret.Name, secret.Value);
             core.setSecret(secret.Value);
@@ -59,9 +68,12 @@ import * as core from "@actions/core";
           }
           break;
         } else {
-          console.log("\x1b[32m%s\x1b[0m","Visit this URL to input secrets:");
-          console.log(secretUrl);
-        
+          console.log(
+            "\x1b[32m%s\x1b[0m",
+            "Visit this URL to input secrets:",
+            secretUrl
+          );
+
           await sleep(9000);
         }
 
