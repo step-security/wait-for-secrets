@@ -5,8 +5,8 @@ Use multi-factor authentication (MFA)/ one-time password (OTPs) in your GitHub A
 ## Why?
 
 - To enable using multi-factor authentication (MFA)/ one-time password (OTPs) for a release workflow, e.g. use OTP to publish to NPM registry.
-- To remove need to persist secrets in GitHub Secrets. Even if someone has write access to the repository, they do not get access to the deployment secrets. e.g. you may not want to share the deployment credential with everyone who as write access to the repository.
-- You have more control over when secrets get used in your workflows. You release the secret during the workflow run. e.g. No surprises that someone triggered a release on a weekend.
+- Even if someone has write access to the repository, they do not get access to the deployment secrets. e.g. you may not want to share the deployment credential with everyone who has write access to the repository.
+- You have more control over when secrets get used in your workflows. You release the secret during the workflow run. No surprises that someone triggered a release on a weekend.
 
 ## How?
 
@@ -84,4 +84,5 @@ Here are a couple of workflows that use `wait-for-secrets`
 ### FAQ
 
 1. Why does `wait-for-secrets` need `id-token: write` permission?
+
    It needs the `id-token: write` permission to authenticate to the StepSecurity API. This is to ensure only the authorized workflow can retreive the secrets.
