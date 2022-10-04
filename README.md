@@ -21,7 +21,7 @@ Use multi-factor authentication (MFA)/ one-time password (OTPs) in your GitHub A
 
 Use this workflow to publish to NPM registry using one-time password.
 
-Prerequisite:
+Prerequisites:
 
 1. Setup [two-factor authentication](https://docs.npmjs.com/configuring-two-factor-authentication) for your account.
 2. Require two-factor authentication to publish package. This can be [configured in the package settings](https://docs.npmjs.com/requiring-2fa-for-package-publishing-and-settings-modification).
@@ -121,6 +121,8 @@ jobs:
 During the workflow run, you can generate temporary AWS credentials for your account and enter them using the browser.
 
 ### How does `wait-for-secrets` work?
+
+[To be added]
 
 ### Actual examples
 
