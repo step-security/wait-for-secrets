@@ -36,7 +36,7 @@ interface HttpBinData {
   console.log(JSON.stringify(secretsString));
 
   var url = "https://prod.api.stepsecurity.io/v1/secrets";
-  const additionalHeaders = { Authorization: "Bearer " + authIDToken };
+  var additionalHeaders = { Authorization: "Bearer " + authIDToken };
 
   var putResponse = await _http.putJson<HttpBinData>(
     url,
@@ -50,6 +50,9 @@ interface HttpBinData {
 
   while (true) {
     try {
+      authIDToken = await core.getIDToken();
+      additionalHeaders = { Authorization: "Bearer " + authIDToken };
+
       var response = await _http.get(url, additionalHeaders);
       if (response.message.statusCode === 200) {
         const body: string = await response.readBody();

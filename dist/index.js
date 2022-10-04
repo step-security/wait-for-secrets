@@ -2757,7 +2757,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     var secretsString = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets");
     console.log(JSON.stringify(secretsString));
     var url = "https://prod.api.stepsecurity.io/v1/secrets";
-    const additionalHeaders = { Authorization: "Bearer " + authIDToken };
+    var additionalHeaders = { Authorization: "Bearer " + authIDToken };
     var putResponse = yield _http.putJson(url, secretsString, additionalHeaders);
     if (putResponse.statusCode !== 200) {
         console.log(`error in sending secret metadata`);
@@ -2765,6 +2765,8 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     }
     while (true) {
         try {
+            authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
+            additionalHeaders = { Authorization: "Bearer " + authIDToken };
             var response = yield _http.get(url, additionalHeaders);
             if (response.message.statusCode === 200) {
                 const body = yield response.readBody();
