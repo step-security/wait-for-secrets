@@ -6,7 +6,7 @@ Use multi-factor authentication (MFA)/ one-time password (OTPs) in your GitHub A
 
 - **MFA** To enable using multi-factor authentication (MFA)/ one-time password (OTPs) for a release workflow, e.g. use OTP to publish to NPM registry.
 - **Separation of duties** Even if someone has write access to the repository, they do not get access to the deployment secrets. e.g. you may not want to share the deployment credential with everyone who has write access to the repository.
-- **More control** You have more control over when secrets get used in your workflows. No surprises that someone triggered a release on a weekend.
+- **More control** You have more control over _when_ secrets get used in your workflows. No surprises that someone triggered a release on a weekend.
 - **Less management overhead** No need to create separate deployment credentials. You can use your existing account for deployment. This removes need to manage and rotate a separate set of deployment credentials.
 
 ## How?
@@ -19,59 +19,106 @@ Use multi-factor authentication (MFA)/ one-time password (OTPs) in your GitHub A
 
 ### Publish to NPM registry using one-time password (OTP)
 
-### Deploy to AWS using temporary security credentials
+Use this workflow to publish to NPM registry using one-time password.
 
-Example on how to provide AWS credentials during the workflow.
+Prerequisite:
+
+1. Setup [two-factor authentication](https://docs.npmjs.com/configuring-two-factor-authentication) for your account.
+2. Require two-factor authentication to publish package. This can be [configured in the package settings](https://docs.npmjs.com/requiring-2fa-for-package-publishing-and-settings-modification).
+3. Create a `Publish` [access token](https://docs.npmjs.com/creating-and-viewing-access-tokens) and set it as a GitHub secret `NODE_AUTH_TOKEN`
 
 ```yaml
+name: Publish Package to npmjs
+on: workflow_dispatch
+
+permissions:
+  contents: read
+
 jobs:
-  release:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          registry-url: "https://registry.npmjs.org"
+      - uses: step-security/get-mfa-secrets@v1
+        id: wait-for-secrets
+        with:
+          secrets: |
+            OTP: 
+              name: 'OTP to publish package'
+              description: 'OTP from authenticator app'
+      - run: npm ci
+      - run: npm publish --otp ${{ steps.wait-for-secrets.outputs.OTP }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+```
+
+- When you run this workflow, you will see a link in the build log to enter the OTP.
+- Click on the link and enter the OTP.
+- The workflow will take the OTP and pass it to the `npm publish` step.
+- OTP will be used to publish the package.
+
+### Slack notification
+
+You can get a notification on Slack when the secret needs to be entered. Set the `slack-webhook-url` as shown below.
+
+### Deploy to AWS using temporary security credentials
+
+Example on how to provide AWS temporary security credentials in a workflow.
+
+```yaml
+name: Deploy to AWS
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
     permissions:
       contents: read
       id-token: write
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - uses: step-security/wait-for-secrets@v1
         id: wait-for-secrets
         with:
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
           secrets: |
-            AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY
+            AWS_ACCESS_KEY_ID: 
+              name: 'AWS access key id'
+              description: 'Access key id for prod'
+            AWS_SECRET_ACCESS_KEY:
+              name: 'AWS secret access key'
+              description: 'Secret access key for prod'
+            AWS_SESSION_TOKEN:
+              name: 'AWS session token'
+              description: 'Session token for prod'
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ steps.wait-for-secrets.outputs.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ steps.wait-for-secrets.outputs.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ steps.wait-for-secrets.outputs.AWS_SESSION_TOKEN }}
           aws-region: us-west-2
 ```
 
-### Slack notification
-
-You can get a notification on Slack when the secret needs to be entered. Set the `slack-webhook-url` as shown below.
-This example also shows how to publish to NPM registry using an OTP.
-
-```yaml
-jobs:
-  release:
-    permissions:
-      contents: read
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: step-security/wait-for-secrets@v1
-        id: wait-for-secrets
-        with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          secrets: |
-            otp
-            npm_token
-      - run: |
-          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > .npmrc
-          npm publish --otp ${{ steps.wait-for-secrets.outputs.otp }}
-        env:
-          NODE_AUTH_TOKEN: ${{ steps.wait-for-secrets.outputs.npm_token }}
-```
+During the workflow run, you can generate temporary AWS credentials for your account and enter them using the browser.
 
 ### How does `wait-for-secrets` work?
 
@@ -79,16 +126,12 @@ jobs:
 
 Here are a couple of workflows that use `wait-for-secrets`
 
-1. https://github.com/step-security/secure-workflows/blob/main/.github/workflows/release.yml#L36-L49
-2. https://github.com/step-security/wait-for-secrets/blob/main/.github/workflows/release.yml#L35-L44
+1. Publish to NPM: https://github.com/step-security/supply-chain-goat/blob/main/.github/workflows/mfa_release.yml
+2. Deploy to AWS: https://github.com/step-security/secure-workflows/blob/main/.github/workflows/release.yml#L36-L49
+3. GitHub release: https://github.com/step-security/wait-for-secrets/blob/main/.github/workflows/release.yml#L35-L44
 
 ### FAQ
 
 1. Why does `wait-for-secrets` need `id-token: write` permission?
 
    It needs the `id-token: write` permission to authenticate to the StepSecurity API. This is to ensure only the authorized workflow can retreive the secrets.
-
-2. How does this compare with OIDC?
-
-   - Management overhead
-   - Misconfiguration
