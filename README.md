@@ -129,8 +129,8 @@ During the workflow run, you can generate temporary AWS credentials for your acc
 Here are a couple of workflows that use `wait-for-secrets`
 
 1. Publish to NPM: https://github.com/step-security/supply-chain-goat/blob/main/.github/workflows/mfa_release.yml
-2. Deploy to AWS: https://github.com/step-security/secure-workflows/blob/main/.github/workflows/release.yml#L36-L49
-3. GitHub release: https://github.com/step-security/wait-for-secrets/blob/main/.github/workflows/release.yml#L35-L44
+2. Deploy to AWS: https://github.com/step-security/secure-workflows/blob/main/.github/workflows/release.yml
+3. GitHub release: https://github.com/step-security/wait-for-secrets/blob/main/.github/workflows/release.yml
 
 ### FAQ
 
