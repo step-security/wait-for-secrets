@@ -7,7 +7,7 @@ Use multi-factor authentication (MFA)/ one-time password (OTPs) in your GitHub A
 - **MFA** To enable using multi-factor authentication (MFA)/ one-time password (OTPs) for a release workflow, e.g. use OTP to publish to NPM registry.
 - **Separation of duties** Even if someone has write access to the repository, they do not get access to the deployment secrets. e.g. you may not want to share the deployment credential with everyone who has write access to the repository.
 - **More control** You have more control over when secrets get used in your workflows. No surprises that someone triggered a release on a weekend.
-- **Less management overhead** No need to create separate deployment credentials. You can use your existing accounts for deployment. This removes need to manage and rotate a separate set of deployment credentials.
+- **Less management overhead** No need to create separate deployment credentials. You can use your existing account for deployment. This removes need to manage and rotate a separate set of deployment credentials.
 
 ## How?
 
