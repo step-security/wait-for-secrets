@@ -1,7 +1,7 @@
 {
-    "name": "step-security-get-mfa-secrets",
-    "version": "0.0.1",
-    "description": "Get secrets",
+    "name": "step-security-wait-for-secrets",
+    "version": "1.0.5",
+    "description": "Publish from GitHub Actions using multi-factor authentication",
     "main": "index.js",
     "scripts": {
         "build": "ncc build src/index.ts --source-map",
@@ -9,15 +9,15 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/step-security/get-mfa-secrets.git"
+        "url": "git+https://github.com/step-security/wait-for-secrets.git"
     },
     "keywords": [],
     "author": "Varun Sharma",
     "license": "Apache License 2.0",
     "bugs": {
-        "url": "https://github.com/step-security/get-mfa-secrets/issues"
+        "url": "https://github.com/step-security/wait-for-secrets/issues"
     },
-    "homepage": "https://github.com/step-security/get-mfa-secrets#readme",
+    "homepage": "https://github.com/step-security/wait-for-secrets#readme",
     "dependencies": {
         "@actions/core": "^1.10.0",
         "@actions/http-client": "^2.0.1"

@@ -2743,12 +2743,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
     var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
     var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
     var runId = process.env["GITHUB_RUN_ID"];
-    var secretUrl = "https://app.stepsecurity.io/secrets?owner=" +
-        owner +
-        "&repo=" +
-        repo +
-        "&runId=" +
-        runId;
+    var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
     var slackWebhookUrl = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("slack-webhook-url");
     if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
         yield sendToSlack(slackWebhookUrl, secretUrl);
