@@ -35,11 +35,10 @@ Publish from GitHub Actions using multi-factor authentication. Wait-for-secrets 
 
 Use this workflow to see a quick demo of `wait-for-secrets` with a dummy secret.
 
-``` yaml
+```yaml
 name: Wait-for-secrets Demo
-on:
-  workflow_dispatch
-  
+on: workflow_dispatch
+
 jobs:
   build:
     permissions:
@@ -54,7 +53,7 @@ jobs:
             DUMMY_SECRET: 
               name: 'Dummy secret'
               description: 'Dummy secret to demo wait-for-secrets'
-      - run: | 
+      - run: |
           echo ${{ steps.get-otp.outputs.DUMMY_SECRET }}
 ```
 
@@ -162,10 +161,6 @@ jobs:
 
 During the workflow run, you can generate temporary AWS credentials for your account and enter them using the browser.
 
-### How does `wait-for-secrets` work?
-
-[To be added]
-
 ### Actual examples
 
 Here are a couple of workflows that use `wait-for-secrets`
@@ -180,6 +175,21 @@ Here are a couple of workflows that use `wait-for-secrets`
 
    It needs the `id-token: write` permission to authenticate to the StepSecurity API. This is to ensure only the authorized workflow can retrieve the secrets.
 
-2. Where is the code for the StepSecurity API?
+2. How does `wait-for-secrets` work?
+
+   This is how `wait-for-secrets` works:
+
+   1. When the `wait-for-secrets` Action is called, it gets an OpenID Connect (OIDC) token using the `id-token: write` permission.
+   2. The token is sent to the StepSecurity API along with the needed list of secrets.
+   3. StepSecurity API authenticates the caller using the token and stores the list of secrets in a data store.
+   4. When a user clicks on the link in the build log, the list of secrets is shown to the user.
+   5. The user enters the secrets in the browser.
+   6. The secrets are sent to the StepSecurity API, where they are stored in the datastore.
+   7. `wait-for-secrets` Action polls every 10 seconds to check if the secrets are available.
+   8. If available, the StepSecurity API returns the secret values to the Action.
+   9. `wait-for-secrets` Action makes a call to the StepSecurity API to clear the secrets in the datastore
+   10. `wait-for-secrets` Action makes the secrets available for future steps.
+
+3. Where is the code for the StepSecurity API?
 
    `Wait-for-secrets` GitHub Action and the backend API it uses are open-source. The backend API is in the [https://github.com/step-security/secure-workflows](https://github.com/step-security/secure-workflows/tree/main/remediation/secrets) repository.
