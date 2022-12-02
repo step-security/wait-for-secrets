@@ -31,6 +31,33 @@ Publish from GitHub Actions using multi-factor authentication. Wait-for-secrets 
 4. The Action will get the secrets you entered in the browser and continue execution.
 5. Use the retrieved secrets in future steps.
 
+### Demo workflow
+
+Use this workflow to see a quick demo of `wait-for-secrets` with a dummy secret.
+
+``` yaml
+name: Wait-for-secrets Demo
+on:
+  workflow_dispatch
+  
+jobs:
+  build:
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: step-security/wait-for-secrets@v1
+        id: get-otp
+        with:
+          secrets: |
+            DUMMY_SECRET: 
+              name: 'Dummy secret'
+              description: 'Dummy secret to demo wait-for-secrets'
+      - run: | 
+          echo ${{ steps.get-otp.outputs.DUMMY_SECRET }}
+```
+
 ### Publish to NPM registry using one-time password (OTP)
 
 Use this workflow to publish to the npm registry using a one-time password.
