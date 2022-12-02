@@ -1,9 +1,4 @@
-<p align="center">
-<picture>
-  <source media="(prefers-color-scheme: light)" srcset="images/banner.png" width="400">
-  <img src="images/banner.png" width="400">
-</picture>
-</p>
+<p align="center"><img src="images/banner.png" width="400" /></p>
 
 <div align="center">
 
@@ -16,6 +11,10 @@
 ---
 
 Publish from GitHub Actions using multi-factor authentication. Wait-for-secrets GitHub Action waits for the developer to enter secrets during a workflow run. Developers can enter secrets using a web browser and use them in the workflow.
+
+<p align="center">
+  <img src="images/WaitForSecretsDemo.gif" alt="Demo" >
+</p>
 
 ## Why?
 
@@ -75,6 +74,7 @@ jobs:
 ```
 
 When you run this workflow, you will see a link in the build log to enter the OTP.
+
 - Click on the link and enter the OTP.
 - The workflow will take the OTP and pass it to the `npm publish` step.
 - OTP will be used to publish the package.
@@ -155,4 +155,4 @@ Here are a couple of workflows that use `wait-for-secrets`
 
 2. Where is the code for the StepSecurity API?
 
-    `Wait-for-secrets` GitHub Action and the backend API it uses are open-source. The backend API is in the [https://github.com/step-security/secure-workflows](https://github.com/step-security/secure-workflows/tree/main/remediation/secrets) repository. 
+   `Wait-for-secrets` GitHub Action and the backend API it uses are open-source. The backend API is in the [https://github.com/step-security/secure-workflows](https://github.com/step-security/secure-workflows/tree/main/remediation/secrets) repository.
