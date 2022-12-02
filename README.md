@@ -1,13 +1,28 @@
-# wait-for-secrets
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="images/banner.png" width="400">
+  <img src="images/banner.png" width="400">
+</picture>
+</p>
 
-Use multi-factor authentication (MFA)/ one-time password (OTPs) in your GitHub Actions workflows. `wait-for-secrets` GitHub Action waits for secrets to be entered during a workflow run. You can enter the secrets using a web browser and then use the secrets in the workflow.
+<div align="center">
+
+[![Maintained by stepsecurity.io](https://img.shields.io/badge/maintained%20by-stepsecurity.io-blueviolet)](https://stepsecurity.io/?utm_source=github&utm_medium=organic_oss&utm_campaign=wait-for-secrets)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/step-security/wait-for-secrets/badge)](https://api.securityscorecards.dev/projects/github.com/step-security/wait-for-secrets)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/step-security/wait-for-secrets/main/LICENSE)
+
+</div>
+
+---
+
+Publish from GitHub Actions using multi-factor authentication. Wait-for-secrets GitHub Action waits for the developer to enter secrets during a workflow run. Developers can enter secrets using a web browser and use them in the workflow.
 
 ## Why?
 
-- **MFA** To enable using multi-factor authentication (MFA)/ one-time password (OTPs) for a release workflow, e.g. use OTP to publish to NPM registry.
-- **Separation of duties** Even if someone has write access to the repository, they do not get access to the deployment secrets. e.g. you may not want to share the deployment credential with everyone who has write access to the repository.
-- **More control** You have more control over _when_ secrets get used in your workflows. No surprises that someone triggered a release on a weekend.
-- **Less management overhead** No need to create separate deployment credentials. You can use your existing account for deployment. This removes need to manage and rotate a separate set of deployment credentials.
+- **MFA** To enable using multi-factor authentication (MFA)/ one-time password (OTPs) for a release workflow, e.g., use OTP to publish to the npm registry.
+- **Separation of duties** Even if someone has write access to the repository, they do not get access to the deployment secrets.
+- **More control** You have more control over _when_ secrets get used in your workflows. With `wait-for-secrets,` there is manual human interaction needed for publishing.
+- **Less management overhead** You can use your existing account for deployment. This removes the need to manage a separate set of deployment credentials.
 
 ## How?
 
@@ -15,16 +30,16 @@ Use multi-factor authentication (MFA)/ one-time password (OTPs) in your GitHub A
 2. The Action will print a URL in the build log every 10 seconds and wait for you to enter the secrets
 3. Click on the URL and enter the secrets that the workflow needs.
 4. The Action will get the secrets you entered in the browser and continue execution.
-5. Use the retreived secrets in future steps.
+5. Use the retrieved secrets in future steps.
 
 ### Publish to NPM registry using one-time password (OTP)
 
-Use this workflow to publish to NPM registry using one-time password.
+Use this workflow to publish to the npm registry using a one-time password.
 
 Prerequisites:
 
 1. Setup [two-factor authentication](https://docs.npmjs.com/configuring-two-factor-authentication) for your account.
-2. Require two-factor authentication to publish package. This can be [configured in the package settings](https://docs.npmjs.com/requiring-2fa-for-package-publishing-and-settings-modification).
+2. Require two-factor authentication to publish the package. This can be [configured in the package settings](https://docs.npmjs.com/requiring-2fa-for-package-publishing-and-settings-modification).
 3. Create a `Publish` [access token](https://docs.npmjs.com/creating-and-viewing-access-tokens) and set it as a GitHub secret `NODE_AUTH_TOKEN`
 
 ```yaml
@@ -46,7 +61,7 @@ jobs:
         with:
           node-version: "16.x"
           registry-url: "https://registry.npmjs.org"
-      - uses: step-security/get-mfa-secrets@v1
+      - uses: step-security/wait-for-secrets@v1
         id: wait-for-secrets
         with:
           secrets: |
@@ -59,7 +74,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
 ```
 
-- When you run this workflow, you will see a link in the build log to enter the OTP.
+When you run this workflow, you will see a link in the build log to enter the OTP.
 - Click on the link and enter the OTP.
 - The workflow will take the OTP and pass it to the `npm publish` step.
 - OTP will be used to publish the package.
@@ -70,7 +85,7 @@ You can get a notification on Slack when the secret needs to be entered. Set the
 
 ### Deploy to AWS using temporary security credentials
 
-Example on how to provide AWS temporary security credentials in a workflow.
+Example of how to provide AWS temporary security credentials in a workflow.
 
 ```yaml
 name: Deploy to AWS
@@ -128,7 +143,7 @@ During the workflow run, you can generate temporary AWS credentials for your acc
 
 Here are a couple of workflows that use `wait-for-secrets`
 
-1. Publish to NPM: https://github.com/step-security/supply-chain-goat/blob/main/.github/workflows/mfa_release.yml
+1. Publish to NPM: https://github.com/jsx-eslint/eslint-plugin-react/blob/master/.github/workflows/npm-publish.yml
 2. Deploy to AWS: https://github.com/step-security/secure-workflows/blob/main/.github/workflows/release.yml
 3. GitHub release: https://github.com/step-security/wait-for-secrets/blob/main/.github/workflows/release.yml
 
@@ -136,4 +151,8 @@ Here are a couple of workflows that use `wait-for-secrets`
 
 1. Why does `wait-for-secrets` need `id-token: write` permission?
 
-   It needs the `id-token: write` permission to authenticate to the StepSecurity API. This is to ensure only the authorized workflow can retreive the secrets.
+   It needs the `id-token: write` permission to authenticate to the StepSecurity API. This is to ensure only the authorized workflow can retrieve the secrets.
+
+2. Where is the code for the StepSecurity API?
+
+    `Wait-for-secrets` GitHub Action and the backend API it uses are open-source. The backend API is in the [https://github.com/step-security/secure-workflows](https://github.com/step-security/secure-workflows/tree/main/remediation/secrets) repository. 

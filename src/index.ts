@@ -17,13 +17,7 @@ interface HttpBinData {
   var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
   var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
   var runId = process.env["GITHUB_RUN_ID"];
-  var secretUrl =
-    "https://app.stepsecurity.io/secrets?owner=" +
-    owner +
-    "&repo=" +
-    repo +
-    "&runId=" +
-    runId;
+  var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
 
   var slackWebhookUrl = core.getInput("slack-webhook-url");
   if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
