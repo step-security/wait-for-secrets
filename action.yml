@@ -1,5 +1,5 @@
-name: "Get MFA Secrets"
-description: "Use Multi-Factor-Authentication (MFA) secrets in your GitHub Actions workflows"
+name: "Wait for secrets"
+description: "Publish from GitHub Actions using multi-factor authentication"
 inputs:
   secrets:
     description: "Secrets to fetch"
