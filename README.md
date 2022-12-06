@@ -10,10 +10,10 @@
 
 ---
 
-Publish from GitHub Actions using multi-factor authentication. Wait-for-secrets GitHub Action waits for the developer to enter secrets during a workflow run. Developers can enter secrets using a web browser and use them in the workflow.
+Wait-for-secrets GitHub Action waits for the developer to enter secrets during a workflow run. Developers can enter secrets using a web browser and use them in the workflow.
 
 <p align="center">
-  <img src="images/WaitForSecretsDemo.gif" width="700" alt="Demo" >
+  <img src="images/WaitForSecretsDemo2.gif" alt="Demo" >
 </p>
 
 ## Why?
