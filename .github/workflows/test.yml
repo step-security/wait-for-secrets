@@ -8,13 +8,13 @@ on:
       - main # to update code coverage
 
 permissions: # added using https://github.com/step-security/secure-workflows
-  id-token: write
+  contents: read
 concurrency:
   group: ${{ github.workflow }}
 jobs:
   test:
     permissions:
-      contents: read
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
