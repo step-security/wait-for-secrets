@@ -1,11 +1,7 @@
 import {
     generateSecretURL,
-    sendToSlack,
-    waitForSecrets,
     setSecrets
   } from "../src/index";
-
-import * as cp from "child_process";
 
 
 
