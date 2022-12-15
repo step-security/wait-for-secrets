@@ -8,7 +8,7 @@ on:
       - main # to update code coverage
 
 permissions: # added using https://github.com/step-security/secure-workflows
-  contents: read
+  actions: write
 concurrency:
   group: ${{ github.workflow }}
 jobs:
