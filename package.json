@@ -5,7 +5,8 @@
     "main": "index.js",
     "scripts": {
         "build": "ncc build src/index.ts --source-map",
-        "lint": "eslint src/**/*.ts"
+        "lint": "eslint src/**/*.ts",
+        "test": "jest"
     },
     "repository": {
         "type": "git",
@@ -20,7 +21,8 @@
     "homepage": "https://github.com/step-security/wait-for-secrets#readme",
     "dependencies": {
         "@actions/core": "^1.10.0",
-        "@actions/http-client": "^2.0.1"
+        "@actions/http-client": "^2.0.1",
+        "ts-node": "^10.9.1"
     },
     "devDependencies": {
         "@types/jest": "^27.0.1",

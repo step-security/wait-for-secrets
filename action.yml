@@ -7,6 +7,9 @@ inputs:
   slack-webhook-url:
     description: "Webhook URL to send link to"
     required: false
+  secrets-timeout:
+    description: "Timeout to input secrets in minutes"
+    default: "10"
 branding:
   icon: "check-square"
   color: "green"
