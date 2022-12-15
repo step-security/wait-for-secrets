@@ -2859,6 +2859,12 @@ var __webpack_exports__ = {};
 (() => {
 "use strict";
 __nccwpck_require__.r(__webpack_exports__);
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "waitForSecrets": () => (/* binding */ waitForSecrets),
+/* harmony export */   "sendToSlack": () => (/* binding */ sendToSlack),
+/* harmony export */   "generateSecretURL": () => (/* binding */ generateSecretURL),
+/* harmony export */   "setSecrets": () => (/* binding */ setSecrets)
+/* harmony export */ });
 /* harmony import */ var _actions_http_client__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(255);
 /* harmony import */ var _actions_http_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_http_client__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(186);
@@ -2875,72 +2881,71 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    // call API
-    let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__.HttpClient();
-    _http.requestOptions = { socketTimeout: 3 * 1000 };
-    var counter = 0;
-    var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
-    var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
-    var runId = process.env["GITHUB_RUN_ID"];
-    var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
-    var slackWebhookUrl = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("slack-webhook-url");
-    if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
-        yield sendToSlack(slackWebhookUrl, secretUrl);
-    }
-    var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
-    var secretsString = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets");
-    console.log(JSON.stringify(secretsString));
-    var url = "https://prod.api.stepsecurity.io/v1/secrets";
-    var additionalHeaders = { Authorization: "Bearer " + authIDToken };
-    var putResponse = yield _http.putJson(url, secretsString, additionalHeaders);
-    if (putResponse.statusCode !== 200) {
-        console.log(`error in sending secret metadata`);
-        return;
-    }
-    while (true) {
-        try {
-            authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
-            additionalHeaders = { Authorization: "Bearer " + authIDToken };
-            var response = yield _http.get(url, additionalHeaders);
-            if (response.message.statusCode === 200) {
-                const body = yield response.readBody();
-                const respJSON = JSON.parse(body);
-                if (respJSON.areSecretsSet === true) {
-                    respJSON.secrets.forEach((secret) => {
-                        _actions_core__WEBPACK_IMPORTED_MODULE_1__.setOutput(secret.Name, secret.Value);
-                        _actions_core__WEBPACK_IMPORTED_MODULE_1__.setSecret(secret.Value);
-                    });
-                    console.log("\nSuccessfully set secrets!");
-                    var response = yield _http.del(url, additionalHeaders);
-                    if (response.message.statusCode === 200) {
-                        console.log("Successfully cleared secrets");
+    waitForSecrets();
+}))();
+function waitForSecrets() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // call API
+        let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__.HttpClient();
+        _http.requestOptions = { socketTimeout: 3 * 1000 };
+        var counter = 0;
+        var secretUrl = generateSecretURL();
+        var slackWebhookUrl = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("slack-webhook-url");
+        var secretsTimeOut = +_actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("secrets-timeout");
+        if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
+            yield sendToSlack(slackWebhookUrl, secretUrl);
+        }
+        var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
+        var secretsString = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets");
+        console.log(JSON.stringify(secretsString));
+        var url = "https://prod.api.stepsecurity.io/v1/secrets";
+        var additionalHeaders = { Authorization: "Bearer " + authIDToken };
+        var putResponse = yield _http.putJson(url, secretsString, additionalHeaders);
+        if (putResponse.statusCode !== 200) {
+            console.log(`error in sending secret metadata`);
+            return;
+        }
+        while (true) {
+            try {
+                authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
+                additionalHeaders = { Authorization: "Bearer " + authIDToken };
+                var response = yield _http.get(url, additionalHeaders);
+                if (response.message.statusCode === 200) {
+                    const body = yield response.readBody();
+                    const respJSON = JSON.parse(body);
+                    if (respJSON.areSecretsSet === true) {
+                        setSecrets(respJSON.secrets);
+                        var response = yield _http.del(url, additionalHeaders);
+                        if (response.message.statusCode === 200) {
+                            console.log("Successfully cleared secrets");
+                        }
+                        break;
                     }
-                    break;
+                    else {
+                        console.log("\x1b[32m%s\x1b[0m", "Visit this URL to input secrets:", secretUrl);
+                        yield sleep(9000);
+                    }
+                    yield sleep(1000);
+                    counter++;
+                    if (counter > 6 * secretsTimeOut) {
+                        console.log("\ntimed out");
+                        break;
+                    }
                 }
                 else {
-                    console.log("\x1b[32m%s\x1b[0m", "Visit this URL to input secrets:", secretUrl);
-                    yield sleep(9000);
-                }
-                counter++;
-                if (counter > 60) {
-                    console.log("\ntimed out");
-                    break;
-                }
-                yield sleep(1000);
-            }
-            else {
-                let body = yield response.readBody();
-                if (body !== "Token used before issued") {
-                    console.log(`\nresponse: ${body}`);
-                    break;
+                    let body = yield response.readBody();
+                    if (body !== "Token used before issued") {
+                        console.log(`\nresponse: ${body}`);
+                        break;
+                    }
                 }
             }
+            catch (e) {
+                console.log(`error in connecting: ${e}`);
+            }
         }
-        catch (e) {
-            console.log(`error in connecting: ${e}`);
-        }
-    }
-}))();
+    });
+}
 function sendToSlack(slackWebhookUrl, url) {
     return __awaiter(this, void 0, void 0, function* () {
         var slackPostData = { text: url };
@@ -2954,6 +2959,20 @@ function sendToSlack(slackWebhookUrl, url) {
             console.log("Error sending to Slack. Status code: " + slackresponse.statusCode);
         }
     });
+}
+function generateSecretURL() {
+    var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
+    var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
+    var runId = process.env["GITHUB_RUN_ID"];
+    var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
+    return secretUrl;
+}
+function setSecrets(secrets) {
+    secrets.forEach((secret) => {
+        _actions_core__WEBPACK_IMPORTED_MODULE_1__.setOutput(secret.Name, secret.Value);
+        _actions_core__WEBPACK_IMPORTED_MODULE_1__.setSecret(secret.Value);
+    });
+    console.log("\nSuccessfully set secrets!");
 }
 function sleep(ms) {
     return new Promise((resolve) => {
