@@ -18,8 +18,10 @@ export async function waitForSecrets() {
   let _http = new httpm.HttpClient();
   _http.requestOptions = { socketTimeout: 3 * 1000 };
   var counter = 0;
+
+  var environmentData = parseDataFromEnvironment();
   
-  var secretUrl = generateSecretURL();
+  var secretUrl = generateSecretURL(environmentData[0], environmentData[1], environmentData[2]);
 
   var slackWebhookUrl = core.getInput("slack-webhook-url");
 
@@ -32,8 +34,6 @@ export async function waitForSecrets() {
   var authIDToken = await core.getIDToken();
 
   var secretsString = core.getMultilineInput("secrets");
-  
-  console.log(JSON.stringify(secretsString));
 
   var url = "https://prod.api.stepsecurity.io/v1/secrets";
   var additionalHeaders = { Authorization: "Bearer " + authIDToken };
@@ -96,7 +96,7 @@ export async function waitForSecrets() {
   }
 }
 
-export async function sendToSlack(slackWebhookUrl, url) {
+async function sendToSlack(slackWebhookUrl, url) {
   var slackPostData = { text: url };
   let _http = new httpm.HttpClient();
   _http.requestOptions = { socketTimeout: 3 * 1000 };
@@ -110,10 +110,18 @@ export async function sendToSlack(slackWebhookUrl, url) {
   }
 }
 
-export function generateSecretURL(): string{
+export function parseDataFromEnvironment(): string[] {
   var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
   var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
   var runId = process.env["GITHUB_RUN_ID"];
+
+  let infoArray:string[] = [owner, repo, runId];
+
+  return infoArray;
+}
+
+export function generateSecretURL(owner, repo, runId): string{
+  
   var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
   return secretUrl
 }
