@@ -2861,7 +2861,7 @@ var __webpack_exports__ = {};
 __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
 /* harmony export */   "waitForSecrets": () => (/* binding */ waitForSecrets),
-/* harmony export */   "sendToSlack": () => (/* binding */ sendToSlack),
+/* harmony export */   "parseDataFromEnvironment": () => (/* binding */ parseDataFromEnvironment),
 /* harmony export */   "generateSecretURL": () => (/* binding */ generateSecretURL),
 /* harmony export */   "setSecrets": () => (/* binding */ setSecrets)
 /* harmony export */ });
@@ -2889,7 +2889,8 @@ function waitForSecrets() {
         let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__.HttpClient();
         _http.requestOptions = { socketTimeout: 3 * 1000 };
         var counter = 0;
-        var secretUrl = generateSecretURL();
+        var environmentData = parseDataFromEnvironment();
+        var secretUrl = generateSecretURL(environmentData[0], environmentData[1], environmentData[2]);
         var slackWebhookUrl = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("slack-webhook-url");
         var secretsTimeOut = +_actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("secrets-timeout");
         if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
@@ -2897,7 +2898,6 @@ function waitForSecrets() {
         }
         var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
         var secretsString = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets");
-        console.log(JSON.stringify(secretsString));
         var url = "https://prod.api.stepsecurity.io/v1/secrets";
         var additionalHeaders = { Authorization: "Bearer " + authIDToken };
         var putResponse = yield _http.putJson(url, secretsString, additionalHeaders);
@@ -2960,10 +2960,14 @@ function sendToSlack(slackWebhookUrl, url) {
         }
     });
 }
-function generateSecretURL() {
+function parseDataFromEnvironment() {
     var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
     var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
     var runId = process.env["GITHUB_RUN_ID"];
+    let infoArray = [owner, repo, runId];
+    return infoArray;
+}
+function generateSecretURL(owner, repo, runId) {
     var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
     return secretUrl;
 }
