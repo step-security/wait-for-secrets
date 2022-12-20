@@ -14,7 +14,7 @@ concurrency:
 jobs:
   test:
     permissions:
-      id-token: write
+      id-token: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
