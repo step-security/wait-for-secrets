@@ -2860,7 +2860,6 @@ var __webpack_exports__ = {};
 "use strict";
 __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   "waitForSecrets": () => (/* binding */ waitForSecrets),
 /* harmony export */   "parseDataFromEnvironment": () => (/* binding */ parseDataFromEnvironment),
 /* harmony export */   "generateSecretURL": () => (/* binding */ generateSecretURL),
 /* harmony export */   "setSecrets": () => (/* binding */ setSecrets)

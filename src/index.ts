@@ -13,7 +13,7 @@ interface HttpBinData {
   waitForSecrets()
 })();
 
-export async function waitForSecrets() {
+async function waitForSecrets() {
   // call API
   let _http = new httpm.HttpClient();
   _http.requestOptions = { socketTimeout: 3 * 1000 };
