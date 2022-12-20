@@ -14,7 +14,7 @@ concurrency:
 jobs:
   test:
     permissions:
-      id-token: read
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,5 +24,5 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Run coverage
-        run: npm test
+        run: npm test -- --coverage
       - uses: codecov/codecov-action@f32b3a3741e1053eb607407145bc9619351dc93b # v2
