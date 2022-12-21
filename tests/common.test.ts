@@ -11,7 +11,7 @@ test("generateSecretURL()", () => {
 });
 
 test('setSecrets()', () => {
-  var secrets = ["Mock_Secret_1", "Mock_Secret_2"]
+  var secrets = [{Name: "Secret_1", Value: "Mock_Value"}, {Name: "Secret_1", Value: "Mock_Value"}]
   expect(setSecrets(secrets)).toBe(undefined);
 });
 
