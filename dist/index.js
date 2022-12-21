@@ -2809,35 +2809,6 @@ module.exports = require("util");
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__nccwpck_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__nccwpck_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__nccwpck_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -2858,16 +2829,35 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
+// ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   "parseDataFromEnvironment": () => (/* binding */ parseDataFromEnvironment),
-/* harmony export */   "generateSecretURL": () => (/* binding */ generateSecretURL),
-/* harmony export */   "setSecrets": () => (/* binding */ setSecrets)
-/* harmony export */ });
-/* harmony import */ var _actions_http_client__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(255);
-/* harmony import */ var _actions_http_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_http_client__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(186);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_1__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/http-client/lib/index.js
+var lib = __nccwpck_require__(255);
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(186);
+;// CONCATENATED MODULE: ./src/common.ts
+
+function parseDataFromEnvironment() {
+    var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
+    var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
+    var runId = process.env["GITHUB_RUN_ID"];
+    let infoArray = [owner, repo, runId];
+    return infoArray;
+}
+function generateSecretURL(owner, repo, runId) {
+    var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
+    return secretUrl;
+}
+function setSecrets(secrets) {
+    secrets.forEach((secret) => {
+        core.setOutput(secret.Name, secret.Value);
+        core.setSecret(secret.Value);
+    });
+    console.log("\nSuccessfully set secrets!");
+}
+
+;// CONCATENATED MODULE: ./src/index.ts
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -2879,24 +2869,25 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 };
 
 
+
 (() => __awaiter(void 0, void 0, void 0, function* () {
     waitForSecrets();
 }))();
 function waitForSecrets() {
     return __awaiter(this, void 0, void 0, function* () {
         // call API
-        let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__.HttpClient();
+        let _http = new lib.HttpClient();
         _http.requestOptions = { socketTimeout: 3 * 1000 };
         var counter = 0;
         var environmentData = parseDataFromEnvironment();
         var secretUrl = generateSecretURL(environmentData[0], environmentData[1], environmentData[2]);
-        var slackWebhookUrl = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("slack-webhook-url");
-        var secretsTimeOut = +_actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("wait-timeout");
+        var slackWebhookUrl = core.getInput("slack-webhook-url");
+        var secretsTimeOut = +core.getInput("wait-timeout");
         if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
             yield sendToSlack(slackWebhookUrl, secretUrl);
         }
-        var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
-        var secretsString = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets");
+        var authIDToken = yield core.getIDToken();
+        var secretsString = core.getMultilineInput("secrets");
         var url = "https://prod.api.stepsecurity.io/v1/secrets";
         var additionalHeaders = { Authorization: "Bearer " + authIDToken };
         var putResponse = yield _http.putJson(url, secretsString, additionalHeaders);
@@ -2906,7 +2897,7 @@ function waitForSecrets() {
         }
         while (true) {
             try {
-                authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
+                authIDToken = yield core.getIDToken();
                 additionalHeaders = { Authorization: "Bearer " + authIDToken };
                 var response = yield _http.get(url, additionalHeaders);
                 if (response.message.statusCode === 200) {
@@ -2948,7 +2939,7 @@ function waitForSecrets() {
 function sendToSlack(slackWebhookUrl, url) {
     return __awaiter(this, void 0, void 0, function* () {
         var slackPostData = { text: url };
-        let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__.HttpClient();
+        let _http = new lib.HttpClient();
         _http.requestOptions = { socketTimeout: 3 * 1000 };
         var slackresponse = yield _http.postJson(slackWebhookUrl, slackPostData);
         if (slackresponse.statusCode === 200) {
@@ -2958,24 +2949,6 @@ function sendToSlack(slackWebhookUrl, url) {
             console.log("Error sending to Slack. Status code: " + slackresponse.statusCode);
         }
     });
-}
-function parseDataFromEnvironment() {
-    var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
-    var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
-    var runId = process.env["GITHUB_RUN_ID"];
-    let infoArray = [owner, repo, runId];
-    return infoArray;
-}
-function generateSecretURL(owner, repo, runId) {
-    var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
-    return secretUrl;
-}
-function setSecrets(secrets) {
-    secrets.forEach((secret) => {
-        _actions_core__WEBPACK_IMPORTED_MODULE_1__.setOutput(secret.Name, secret.Value);
-        _actions_core__WEBPACK_IMPORTED_MODULE_1__.setSecret(secret.Value);
-    });
-    console.log("\nSuccessfully set secrets!");
 }
 function sleep(ms) {
     return new Promise((resolve) => {
