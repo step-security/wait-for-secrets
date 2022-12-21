@@ -13,8 +13,6 @@ concurrency:
   group: ${{ github.workflow }}
 jobs:
   test:
-    permissions:
-      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
