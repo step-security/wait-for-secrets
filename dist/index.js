@@ -2891,7 +2891,7 @@ function waitForSecrets() {
         var environmentData = parseDataFromEnvironment();
         var secretUrl = generateSecretURL(environmentData[0], environmentData[1], environmentData[2]);
         var slackWebhookUrl = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("slack-webhook-url");
-        var secretsTimeOut = +_actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("secrets-timeout");
+        var secretsTimeOut = +_actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("wait-timeout");
         if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
             yield sendToSlack(slackWebhookUrl, secretUrl);
         }

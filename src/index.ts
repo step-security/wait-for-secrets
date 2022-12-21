@@ -33,7 +33,7 @@ async function waitForSecrets() {
 
   var slackWebhookUrl = core.getInput("slack-webhook-url");
 
-  var secretsTimeOut: number = +core.getInput("secrets-timeout");
+  var secretsTimeOut: number = +core.getInput("wait-timeout");
 
   if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
     await sendToSlack(slackWebhookUrl, secretUrl);
