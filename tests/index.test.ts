@@ -1,11 +1,13 @@
 import {
-    generateSecretURL,
-    setSecrets,
-    parseDataFromEnvironment
-  } from "../src/index";
+  generateSecretURL,
+  setSecrets,
+  parseDataFromEnvironment,
+} from "../src/common";
 
-test('generateSecretURL()', () => {
-  expect(generateSecretURL("step-security", "test","12345")).toBe("https://app.stepsecurity.io/secrets/step-security/test/12345");
+test("generateSecretURL()", () => {
+  expect(generateSecretURL("step-security", "test", "12345")).toBe(
+    "https://app.stepsecurity.io/secrets/step-security/test/12345"
+  );
 });
 
 // test('setSecrets()', () => {
@@ -13,9 +15,13 @@ test('generateSecretURL()', () => {
 //   expect(setSecrets(secrets)).toBe(undefined);
 // });
 
-test('parseDataFromEnvironment()', () => {
+test("parseDataFromEnvironment()", () => {
   process.env["GITHUB_REPOSITORY"] = "step-security/test";
   process.env["GITHUB_RUN_ID"] = "12345";
 
-  expect(parseDataFromEnvironment()).toStrictEqual(["step-security","test","12345"]);
+  expect(parseDataFromEnvironment()).toStrictEqual([
+    "step-security",
+    "test",
+    "12345",
+  ]);
 });

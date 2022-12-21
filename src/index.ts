@@ -1,6 +1,10 @@
 import * as httpm from "@actions/http-client";
 import * as core from "@actions/core";
-
+import {
+  generateSecretURL,
+  parseDataFromEnvironment,
+  setSecrets,
+} from "./common";
 interface HttpBinData {
   url: string;
   data: any;
@@ -10,7 +14,7 @@ interface HttpBinData {
 }
 
 (async () => {
-  waitForSecrets()
+  waitForSecrets();
 })();
 
 async function waitForSecrets() {
@@ -20,14 +24,18 @@ async function waitForSecrets() {
   var counter = 0;
 
   var environmentData = parseDataFromEnvironment();
-  
-  var secretUrl = generateSecretURL(environmentData[0], environmentData[1], environmentData[2]);
+
+  var secretUrl = generateSecretURL(
+    environmentData[0],
+    environmentData[1],
+    environmentData[2]
+  );
 
   var slackWebhookUrl = core.getInput("slack-webhook-url");
 
   var secretsTimeOut: number = +core.getInput("secrets-timeout");
 
-  if (slackWebhookUrl !== undefined && slackWebhookUrl !== ""){
+  if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
     await sendToSlack(slackWebhookUrl, secretUrl);
   }
 
@@ -78,11 +86,10 @@ async function waitForSecrets() {
         await sleep(1000);
 
         counter++;
-        if (counter > 6*secretsTimeOut) {
+        if (counter > 6 * secretsTimeOut) {
           console.log("\ntimed out");
           break;
         }
-        
       } else {
         let body: string = await response.readBody();
         if (body !== "Token used before issued") {
@@ -110,34 +117,8 @@ async function sendToSlack(slackWebhookUrl, url) {
   }
 }
 
-export function parseDataFromEnvironment(): string[] {
-  var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
-  var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
-  var runId = process.env["GITHUB_RUN_ID"];
-
-  let infoArray:string[] = [owner, repo, runId];
-
-  return infoArray;
-}
-
-export function generateSecretURL(owner, repo, runId): string{
-  
-  var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
-  return secretUrl
-}
-
-export function setSecrets(secrets){
-    secrets.forEach((secret) => {
-    core.setOutput(secret.Name, secret.Value);
-    core.setSecret(secret.Value);
-  });
-
-  console.log("\nSuccessfully set secrets!");
-}
-
 function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 }
-
