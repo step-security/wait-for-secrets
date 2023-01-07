@@ -2809,35 +2809,6 @@ module.exports = require("util");
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__nccwpck_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__nccwpck_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__nccwpck_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -2858,11 +2829,35 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
+// ESM COMPAT FLAG
 __nccwpck_require__.r(__webpack_exports__);
-/* harmony import */ var _actions_http_client__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(255);
-/* harmony import */ var _actions_http_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_http_client__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(186);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_1__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/http-client/lib/index.js
+var lib = __nccwpck_require__(255);
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(186);
+;// CONCATENATED MODULE: ./src/common.ts
+
+function parseDataFromEnvironment() {
+    var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
+    var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
+    var runId = process.env["GITHUB_RUN_ID"];
+    let infoArray = [owner, repo, runId];
+    return infoArray;
+}
+function generateSecretURL(owner, repo, runId) {
+    var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
+    return secretUrl;
+}
+function setSecrets(secrets) {
+    secrets.forEach((secret) => {
+        core.setOutput(secret.Name, secret.Value);
+        core.setSecret(secret.Value);
+    });
+    console.log("\nSuccessfully set secrets!");
+}
+
+;// CONCATENATED MODULE: ./src/index.ts
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -2874,77 +2869,77 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 };
 
 
+
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    // call API
-    let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__.HttpClient();
-    _http.requestOptions = { socketTimeout: 3 * 1000 };
-    var counter = 0;
-    var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
-    var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
-    var runId = process.env["GITHUB_RUN_ID"];
-    var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
-    var slackWebhookUrl = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getInput("slack-webhook-url");
-    if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
-        yield sendToSlack(slackWebhookUrl, secretUrl);
-    }
-    var authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
-    var secretsString = _actions_core__WEBPACK_IMPORTED_MODULE_1__.getMultilineInput("secrets");
-    console.log(JSON.stringify(secretsString));
-    var url = "https://prod.api.stepsecurity.io/v1/secrets";
-    var additionalHeaders = { Authorization: "Bearer " + authIDToken };
-    var putResponse = yield _http.putJson(url, secretsString, additionalHeaders);
-    if (putResponse.statusCode !== 200) {
-        console.log(`error in sending secret metadata`);
-        return;
-    }
-    while (true) {
-        try {
-            authIDToken = yield _actions_core__WEBPACK_IMPORTED_MODULE_1__.getIDToken();
-            additionalHeaders = { Authorization: "Bearer " + authIDToken };
-            var response = yield _http.get(url, additionalHeaders);
-            if (response.message.statusCode === 200) {
-                const body = yield response.readBody();
-                const respJSON = JSON.parse(body);
-                if (respJSON.areSecretsSet === true) {
-                    respJSON.secrets.forEach((secret) => {
-                        _actions_core__WEBPACK_IMPORTED_MODULE_1__.setOutput(secret.Name, secret.Value);
-                        _actions_core__WEBPACK_IMPORTED_MODULE_1__.setSecret(secret.Value);
-                    });
-                    console.log("\nSuccessfully set secrets!");
-                    var response = yield _http.del(url, additionalHeaders);
-                    if (response.message.statusCode === 200) {
-                        console.log("Successfully cleared secrets");
+    waitForSecrets();
+}))();
+function waitForSecrets() {
+    return __awaiter(this, void 0, void 0, function* () {
+        // call API
+        let _http = new lib.HttpClient();
+        _http.requestOptions = { socketTimeout: 3 * 1000 };
+        var counter = 0;
+        var environmentData = parseDataFromEnvironment();
+        var secretUrl = generateSecretURL(environmentData[0], environmentData[1], environmentData[2]);
+        var slackWebhookUrl = core.getInput("slack-webhook-url");
+        var secretsTimeOut = +core.getInput("wait-timeout");
+        if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
+            yield sendToSlack(slackWebhookUrl, secretUrl);
+        }
+        var authIDToken = yield core.getIDToken();
+        var secretsString = core.getMultilineInput("secrets");
+        var url = "https://prod.api.stepsecurity.io/v1/secrets";
+        var additionalHeaders = { Authorization: "Bearer " + authIDToken };
+        var putResponse = yield _http.putJson(url, secretsString, additionalHeaders);
+        if (putResponse.statusCode !== 200) {
+            console.log(`error in sending secret metadata`);
+            return;
+        }
+        while (true) {
+            try {
+                authIDToken = yield core.getIDToken();
+                additionalHeaders = { Authorization: "Bearer " + authIDToken };
+                var response = yield _http.get(url, additionalHeaders);
+                if (response.message.statusCode === 200) {
+                    const body = yield response.readBody();
+                    const respJSON = JSON.parse(body);
+                    if (respJSON.areSecretsSet === true) {
+                        setSecrets(respJSON.secrets);
+                        var response = yield _http.del(url, additionalHeaders);
+                        if (response.message.statusCode === 200) {
+                            console.log("Successfully cleared secrets");
+                        }
+                        break;
                     }
-                    break;
+                    else {
+                        console.log("\x1b[32m%s\x1b[0m", "Visit this URL to input secrets:", secretUrl);
+                        yield sleep(9000);
+                    }
+                    yield sleep(1000);
+                    counter++;
+                    if (counter > 6 * secretsTimeOut) {
+                        console.log("\ntimed out");
+                        break;
+                    }
                 }
                 else {
-                    console.log("\x1b[32m%s\x1b[0m", "Visit this URL to input secrets:", secretUrl);
-                    yield sleep(9000);
-                }
-                counter++;
-                if (counter > 60) {
-                    console.log("\ntimed out");
-                    break;
-                }
-                yield sleep(1000);
-            }
-            else {
-                let body = yield response.readBody();
-                if (body !== "Token used before issued") {
-                    console.log(`\nresponse: ${body}`);
-                    break;
+                    let body = yield response.readBody();
+                    if (body !== "Token used before issued") {
+                        console.log(`\nresponse: ${body}`);
+                        break;
+                    }
                 }
             }
+            catch (e) {
+                console.log(`error in connecting: ${e}`);
+            }
         }
-        catch (e) {
-            console.log(`error in connecting: ${e}`);
-        }
-    }
-}))();
+    });
+}
 function sendToSlack(slackWebhookUrl, url) {
     return __awaiter(this, void 0, void 0, function* () {
         var slackPostData = { text: url };
-        let _http = new _actions_http_client__WEBPACK_IMPORTED_MODULE_0__.HttpClient();
+        let _http = new lib.HttpClient();
         _http.requestOptions = { socketTimeout: 3 * 1000 };
         var slackresponse = yield _http.postJson(slackWebhookUrl, slackPostData);
         if (slackresponse.statusCode === 200) {

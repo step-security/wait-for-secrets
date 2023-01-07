@@ -1,6 +1,10 @@
 import * as httpm from "@actions/http-client";
 import * as core from "@actions/core";
-
+import {
+  generateSecretURL,
+  parseDataFromEnvironment,
+  setSecrets,
+} from "./common";
 interface HttpBinData {
   url: string;
   data: any;
@@ -10,16 +14,27 @@ interface HttpBinData {
 }
 
 (async () => {
+  waitForSecrets();
+})();
+
+async function waitForSecrets() {
   // call API
   let _http = new httpm.HttpClient();
   _http.requestOptions = { socketTimeout: 3 * 1000 };
   var counter = 0;
-  var repo = process.env["GITHUB_REPOSITORY"].split("/")[1];
-  var owner = process.env["GITHUB_REPOSITORY"].split("/")[0];
-  var runId = process.env["GITHUB_RUN_ID"];
-  var secretUrl = `https://app.stepsecurity.io/secrets/${owner}/${repo}/${runId}`;
+
+  var environmentData = parseDataFromEnvironment();
+
+  var secretUrl = generateSecretURL(
+    environmentData[0],
+    environmentData[1],
+    environmentData[2]
+  );
 
   var slackWebhookUrl = core.getInput("slack-webhook-url");
+
+  var secretsTimeOut: number = +core.getInput("wait-timeout");
+
   if (slackWebhookUrl !== undefined && slackWebhookUrl !== "") {
     await sendToSlack(slackWebhookUrl, secretUrl);
   }
@@ -27,7 +42,6 @@ interface HttpBinData {
   var authIDToken = await core.getIDToken();
 
   var secretsString = core.getMultilineInput("secrets");
-  console.log(JSON.stringify(secretsString));
 
   var url = "https://prod.api.stepsecurity.io/v1/secrets";
   var additionalHeaders = { Authorization: "Bearer " + authIDToken };
@@ -53,12 +67,7 @@ interface HttpBinData {
         const respJSON = JSON.parse(body);
 
         if (respJSON.areSecretsSet === true) {
-          respJSON.secrets.forEach((secret) => {
-            core.setOutput(secret.Name, secret.Value);
-            core.setSecret(secret.Value);
-          });
-
-          console.log("\nSuccessfully set secrets!");
+          setSecrets(respJSON.secrets);
           var response = await _http.del(url, additionalHeaders);
           if (response.message.statusCode === 200) {
             console.log("Successfully cleared secrets");
@@ -74,12 +83,13 @@ interface HttpBinData {
           await sleep(9000);
         }
 
+        await sleep(1000);
+
         counter++;
-        if (counter > 60) {
+        if (counter > 6 * secretsTimeOut) {
           console.log("\ntimed out");
           break;
         }
-        await sleep(1000);
       } else {
         let body: string = await response.readBody();
         if (body !== "Token used before issued") {
@@ -91,7 +101,7 @@ interface HttpBinData {
       console.log(`error in connecting: ${e}`);
     }
   }
-})();
+}
 
 async function sendToSlack(slackWebhookUrl, url) {
   var slackPostData = { text: url };
