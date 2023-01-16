@@ -1,6 +1,9 @@
 import * as httpm from "@actions/http-client";
 import * as core from "@actions/core";
+import * as kp from "keypair";
+import * as crypto from "crypto";
 import {
+  generateKeys,
   generateSecretURL,
   parseDataFromEnvironment,
   setSecrets,
@@ -41,6 +44,12 @@ async function waitForSecrets() {
 
   var authIDToken = await core.getIDToken();
 
+  var keys = generateKeys();
+
+  var publicKey = keys[0];
+
+  var privateKey = keys[1];
+
   var secretsString = core.getMultilineInput("secrets");
 
   var url = "https://prod.api.stepsecurity.io/v1/secrets";
@@ -48,7 +57,7 @@ async function waitForSecrets() {
 
   var putResponse = await _http.putJson<HttpBinData>(
     url,
-    secretsString,
+    {publicKey:publicKey,secrets:secretsString},
     additionalHeaders
   );
   if (putResponse.statusCode !== 200) {
@@ -67,7 +76,7 @@ async function waitForSecrets() {
         const respJSON = JSON.parse(body);
 
         if (respJSON.areSecretsSet === true) {
-          setSecrets(respJSON.secrets);
+          setSecrets(respJSON.secrets, respJSON.privateKey);
           var response = await _http.del(url, additionalHeaders);
           if (response.message.statusCode === 200) {
             console.log("Successfully cleared secrets");
