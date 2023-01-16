@@ -3,6 +3,7 @@ import {
   generateSecretURL,
   setSecrets,
   parseDataFromEnvironment,
+  generateKeys,
 } from "../src/common";
 
 test("generateSecretURL()", () => {
@@ -21,17 +22,6 @@ test("parseDataFromEnvironment()", () => {
   process.env["GITHUB_RUN_ID"] = "12345";
 
   expect(parseDataFromEnvironment()).toStrictEqual([
-    "step-security",
-    "test",
-    "12345",
-  ]);
-});
-
-test("keypair()", () => {
-  process.env["GITHUB_REPOSITORY"] = "step-security/test";
-  process.env["GITHUB_RUN_ID"] = "12345";
-
-  expect(keypair()).toStrictEqual([
     "step-security",
     "test",
     "12345",
