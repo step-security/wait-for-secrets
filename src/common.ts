@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import * as kp from "keypair";
-import * as crypto from "node:crypto";
+import * as crypto from "crypto";
 import { buffer } from "stream/consumers";
 
 export function parseDataFromEnvironment(): string[] {
@@ -31,8 +31,8 @@ export function setSecrets(secrets, privateKey) {
 }
 
 export function generateKeys(): string[]{
-  var keyPair = kp.keypair();
-  console.log(kp.keypair)
-  var keys = [keyPair['public'], keyPair['private']]
+  var keyPair = kp.default();
+  //console.log(keyPair)
+  var keys = [keyPair.public, keyPair.private]
   return keys
 }
