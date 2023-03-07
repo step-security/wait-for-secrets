@@ -21,7 +21,7 @@
     "homepage": "https://github.com/step-security/wait-for-secrets#readme",
     "dependencies": {
         "@actions/core": "^1.10.0",
-        "@actions/http-client": "^2.0.1",
+        "@actions/http-client": "^2.1.0",
         "ts-node": "^10.9.1"
     },
     "devDependencies": {
