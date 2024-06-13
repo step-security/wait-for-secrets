@@ -1,6 +1,6 @@
 {
     "name": "step-security-wait-for-secrets",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Publish from GitHub Actions using multi-factor authentication",
     "main": "index.js",
     "scripts": {
