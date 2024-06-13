@@ -15,8 +15,6 @@ interface HttpBinData {
 
 (async () => {
   waitForSecrets();
-  // see https://github.com/ruby/setup-ruby/issues/543
-  process.exit(0);
 })();
 
 async function waitForSecrets() {
@@ -103,6 +101,9 @@ async function waitForSecrets() {
       console.log(`error in connecting: ${e}`);
     }
   }
+
+  // see https://github.com/ruby/setup-ruby/issues/543
+  process.exit(0);
 }
 
 async function sendToSlack(slackWebhookUrl, url) {

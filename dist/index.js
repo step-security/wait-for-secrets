@@ -2872,8 +2872,6 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 (() => __awaiter(void 0, void 0, void 0, function* () {
     waitForSecrets();
-    // see https://github.com/ruby/setup-ruby/issues/543
-    process.exit(0);
 }))();
 function waitForSecrets() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -2936,6 +2934,8 @@ function waitForSecrets() {
                 console.log(`error in connecting: ${e}`);
             }
         }
+        // see https://github.com/ruby/setup-ruby/issues/543
+        process.exit(0);
     });
 }
 function sendToSlack(slackWebhookUrl, url) {
