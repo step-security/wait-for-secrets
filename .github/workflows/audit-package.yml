@@ -1,0 +1,24 @@
+name: NPM Audit Fix Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Use --force flag for npm audit fix?"
+        required: true
+        type: boolean
+      base_branch:
+        description: "Specify a base branch"
+        required: false
+        default: "main"
+
+jobs:
+  audit-fix:
+    uses: step-security/reusable-workflows/.github/workflows/npm_audit_fix.yml@v1
+    with:
+      force: ${{ inputs.force }}
+      base_branch: ${{ inputs.base_branch }}
+
+permissions:
+  contents: write
+  pull-requests: write
