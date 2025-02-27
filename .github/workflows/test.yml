@@ -33,4 +33,4 @@ jobs:
         run: npm install
       - name: Run coverage
         run: npm test -- --coverage
-      - uses: codecov/codecov-action@d9f34f8cd5cb3b3eb79b3e4b5dae3a16df499a70 # v3.1.1
+      - uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574 # v5.4.0
