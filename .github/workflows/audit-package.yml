@@ -11,14 +11,18 @@ on:
         description: "Specify a base branch"
         required: false
         default: "main"
+  schedule:
+    - cron: "0 0 * * 1"
 
 jobs:
   audit-fix:
-    uses: step-security/reusable-workflows/.github/workflows/npm_audit_fix.yml@v1
+    uses: step-security/reusable-workflows/.github/workflows/audit_fix.yml@v1
     with:
-      force: ${{ inputs.force }}
-      base_branch: ${{ inputs.base_branch }}
+      force: ${{ inputs.force || false }}
+      base_branch: ${{ inputs.base_branch || 'main' }}
 
 permissions:
   contents: write
   pull-requests: write
+  packages: read
+  issues: write
