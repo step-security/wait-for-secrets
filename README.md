@@ -167,7 +167,6 @@ Here are a couple of workflows that use `wait-for-secrets`
 
 1. Publish to NPM: https://github.com/jsx-eslint/eslint-plugin-react/blob/master/.github/workflows/npm-publish.yml
 2. Deploy to AWS: https://github.com/step-security/secure-workflows/blob/main/.github/workflows/release.yml
-3. GitHub release: https://github.com/step-security/wait-for-secrets/blob/main/.github/workflows/release.yml
 
 ### FAQ
 
